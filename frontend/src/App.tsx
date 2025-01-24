@@ -1,24 +1,64 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react';
 
-function App() {
+interface EleringDataModel {
+  centsPerKwh: number;
+  centsPerKwhWithVat: number;
+  eurPerMwh: number;
+  eurPerMwhWithVat: number;
+  fromDateTime: string;
+  toDateTime: string;
+}
+
+export default function App() {
+  const [data, setData] = useState<EleringDataModel[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const startDateTime = '2025-01-22T00:00:00Z';
+        const endDateTime = '2025-01-22T23:59:00Z';
+        const response = await fetch(`http://localhost:8080/api/fetch-elering-data?startDateTime=${startDateTime}&endDateTime=${endDateTime}`);
+
+        if (!response.ok) {
+          throw new Error(`${response.status} ${response.statusText}`);
+        }
+
+        const jsonData: EleringDataModel[] = await response.json();
+        setData(jsonData);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error fetching data:', error.message);
+          setError(error.message);
+        } else {
+          console.error('Unknown error occurred');
+          setError('An unknown error occurred');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <Link to='/cake'>Visit /cake</Link>
-
+      {loading ? (
+        <h2>Loading...</h2>
+      ) : error ? (
+        <h2>Error: {error}</h2>
+      ) : (
+        <ul>
+          {data.map((item, index) => (
+            <li key={index}>
+              Cents Per Kwh: {item.centsPerKwh}, From: {item.fromDateTime}, To: {item.toDateTime}
+            </li>
+          ))}
+        </ul>
+      )}
     </>
-  )
+  );
 }
-
-export default App
