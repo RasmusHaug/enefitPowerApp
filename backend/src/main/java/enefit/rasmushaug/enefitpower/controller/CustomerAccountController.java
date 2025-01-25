@@ -16,6 +16,7 @@ import enefit.rasmushaug.enefitpower.dto.CustomerResponseError;
 import enefit.rasmushaug.enefitpower.dto.LoginRequest;
 import enefit.rasmushaug.enefitpower.model.Customer;
 import enefit.rasmushaug.enefitpower.service.CustomerService;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Controller for handling customer account operations.
@@ -78,13 +79,38 @@ public class CustomerAccountController {
      *              and 401 Unauthorized if the credentials are invalid.
      */
     @PostMapping("/login")
-    public ResponseEntity<String> loginCustomer(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<CustomerResponse> loginCustomer(@RequestBody LoginRequest loginRequest, HttpSession session) {
         Customer customer = customerService.login(loginRequest.getUsername(), loginRequest.getPassword());
         if (customer != null) {
-            return ResponseEntity.ok("Login succesfull");
+            CustomerResponse sessionCustomer = new CustomerResponse(customer);
+            session.setAttribute("user", sessionCustomer.getCustomerId());
+            return ResponseEntity.ok(sessionCustomer);
         }
-        return ResponseEntity.status(401).body("Invalid username or password");
+        return ResponseEntity.status(401).body(null);
     }
+
+    /**
+     * Logs out an existing customer.
+     *
+     * This API endpoint allows customers to log out by invalidating their session.
+     *
+     * @param session The HTTP session to invalidate.
+     * @return ResponseEntity<String> A responseEntity with a logout success message.
+     *         Returns HTTP 200 OK on successful logout.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutCustomer(HttpSession session) {
+        try {
+            if (session != null) {
+                session.invalidate();
+            }
+            return ResponseEntity.ok("Logged out successfully.");
+        } catch (Exception e) {
+            logger.error("Error during logout: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body("Unexpected error during logout.");
+        }
+    }
+
 
     /**
      * Custom handler for username already taken exception

@@ -6,7 +6,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import enefit.rasmushaug.enefitpower.model.Customer;
@@ -40,6 +39,17 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/customers/register", "/api/customers/login").permitAll()
                 .anyRequest().authenticated()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+            )
+            .sessionManagement(session -> session
+                .maximumSessions(1)
+                .expiredUrl("/login?expired=true")
+                .maxSessionsPreventsLogin(true)
             );
         return http.build();
     }
