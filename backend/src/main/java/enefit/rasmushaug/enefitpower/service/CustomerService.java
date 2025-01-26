@@ -11,13 +11,11 @@ import enefit.rasmushaug.enefitpower.repository.CustomerRepository;
 
 /**
  * Service layer for managing customer operations: registration and login.
- * <p>
+ *
  * This service provides methods to register a new customer, ensuring that the username is unique,
  * and to authenticate an existing customer during login by validating the provided username and password.
- * </p>
- * <p>
+ *
  * The class also handles password encoding and logging of successful and failed registration and login attempts.
- * </p>
  */
 @Service
 public class CustomerService {
@@ -61,7 +59,6 @@ public class CustomerService {
     public Customer login(String username, String password) {
         Customer customer = customerRepository.findByUsername(username);
         if (customer != null && passwordEncoder.matches(password, customer.getPassword())) {
-            logger.info("User logged in successfully: {}", customer);
             return customer;
         }
         if (customer == null) {

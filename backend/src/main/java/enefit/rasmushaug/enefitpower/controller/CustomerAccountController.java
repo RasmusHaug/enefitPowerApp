@@ -84,6 +84,8 @@ public class CustomerAccountController {
         if (customer != null) {
             CustomerResponse sessionCustomer = new CustomerResponse(customer);
             session.setAttribute("user", sessionCustomer.getCustomerId());
+            sessionCustomer.setSessionId(session.getId());
+            logger.info("User logged in successfully: {}", sessionCustomer);
             return ResponseEntity.ok(sessionCustomer);
         }
         return ResponseEntity.status(401).body(null);
@@ -99,12 +101,16 @@ public class CustomerAccountController {
      *         Returns HTTP 200 OK on successful logout.
      */
     @PostMapping("/logout")
-    public ResponseEntity<String> logoutCustomer(HttpSession session) {
+    public ResponseEntity<String> logoutCustomer(@RequestBody String sessionId, HttpSession session) {
+        String cleanedSessionId = sessionId.replace("\"", "").trim();
         try {
-            if (session != null) {
+            if (cleanedSessionId.equals(session.getId())) {
                 session.invalidate();
+                logger.info("Successfully logged out customer with session ID {}", cleanedSessionId);
+                return ResponseEntity.ok("Logged out successfully.");
             }
-            return ResponseEntity.ok("Logged out successfully.");
+            logger.warn("Invalid session ID provided for logout: {}", cleanedSessionId);
+            return ResponseEntity.status(401).body("Invalid session ID.");
         } catch (Exception e) {
             logger.error("Error during logout: {}", e.getMessage(), e);
             return ResponseEntity.status(500).body("Unexpected error during logout.");

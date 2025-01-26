@@ -15,6 +15,7 @@ public class CustomerResponse {
     private String firstName;
     private String lastName;
     private String username;
+    private String sessionId;
 
     /**
      * Constructs a new CustomerResponse object from the provided Customer entity.
@@ -28,6 +29,25 @@ public class CustomerResponse {
         this.firstName = customer.getFirstName();
         this.lastName = customer.getLastName();
         this.username = customer.getUsername();
+    }
+
+    /**
+     * Returns a string representation of the customer object.
+     *
+     * This method provides a simplified version of the customer details, excluding the password.
+     * Primarily meant to be used for logging and debugging purposes.
+     *
+     * @return A string representing the customer object, including customerId, firstName, lastName, and username.
+     */
+    @Override
+    public String toString() {
+        return "Customer{" +
+            "customerId=" + customerId +
+            ", firstName='" + firstName + '\'' +
+            ", lastName='" + lastName + '\'' +
+            ", username='" + username + '\'' +
+            ", sessionId='" + sessionId + '\'' +
+            '}';
     }
 
     /**
@@ -64,5 +84,22 @@ public class CustomerResponse {
      */
     public String getUsername() {
         return username;
+    }
+
+    /**
+     * Getter method to obtain customer sessionId.
+     *
+     * @return String The sessionId of the customer.
+     */
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    /**
+     * Setter method to set customer sessionId.
+     *
+     */
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }
