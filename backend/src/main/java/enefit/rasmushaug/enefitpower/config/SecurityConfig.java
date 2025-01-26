@@ -40,12 +40,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/customers/register", "/api/customers/login", "/api/customers/logout").permitAll()
                 .anyRequest().authenticated()
             )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-            )
             .sessionManagement(session -> session
                 .maximumSessions(1)
                 .expiredUrl("/login?expired=true")
