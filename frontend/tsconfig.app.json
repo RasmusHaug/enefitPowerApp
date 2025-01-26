@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "src/CustomerManagement/Login.tsx", "src/CustomerManagement/Register.tsx"]
 }
