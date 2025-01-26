@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -29,7 +29,7 @@ public class EleringApiController {
     }
 
     @GetMapping("/fetch-elering-date")
-    public ResponseEntity<List<EleringData>> fetchEleringDate(@RequestBody LocalDate date) {
-        return ResponseEntity.ok(eleringApiService.fetchDataAndStoreToday());
+    public ResponseEntity<List<EleringData>> fetchEleringDate(@RequestParam LocalDate date) {
+        return ResponseEntity.ok(eleringApiService.fetchDataAndStoreDate(date));
     }
 }
