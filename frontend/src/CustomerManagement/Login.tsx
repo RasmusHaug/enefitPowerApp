@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { useUser } from './UserContext'
+
 
 interface LoginState {
     username: string;
@@ -13,6 +15,7 @@ const Login: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<String | null>(null);
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const { setUser } = useUser();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -53,9 +56,10 @@ const Login: React.FC = () => {
                 return;
             }
             const data = await response.json();
-            console.log("Login successful", data);
+            setUser(data);
+            console.log(data);
             alert("Login successful!");
-            navigate('/dashboard')
+            navigate('/dashboard');
         } catch (error) {
             console.error("Error during logion:", error);
             setErrorMessage("An error occurred while trying to connect to the server. Please try again later.")
