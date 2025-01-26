@@ -27,7 +27,7 @@ public class EleringApiService {
     }
 
     @Scheduled(cron = "0 0 3 * * ?")
-    public List<EleringData> fetchDataAndStoreToday() {
+    public List<EleringData> fetchEleringData() {
         LocalDate today = LocalDate.now();
         String startDateTime = today.atStartOfDay().toString() + "Z";
         String endDateTime = startDateTime;
@@ -37,12 +37,25 @@ public class EleringApiService {
         return fetchDataFromEleringApi(url, today);
     }
 
-    public List<EleringData> fetchDataAndStoreDate(LocalDate date) {
+    public List<EleringData> fetchEleringData(LocalDate date) {
         String startDateTime = date.atStartOfDay().toString() + "Z";
         String endDateTime = startDateTime;
 
         String url = String.format("%s?startDateTime=%s&endDateTime=%s", ELERING_URL, startDateTime, endDateTime);
         return fetchDataFromEleringApi(url, date);
+    }
+
+    public List<EleringData> fetchEleringData(LocalDate fromDate, LocalDate endDate) {
+        List<EleringData> combinedData = new ArrayList<>();
+
+        for (LocalDate currentDate = fromDate; !currentDate.isAfter(endDate); currentDate = currentDate.plusDays(1)) {
+            String startDateTime = currentDate.atStartOfDay().toString() + "Z";
+            String endDateTime = startDateTime;
+            String url = String.format("%s?startDateTime=%s&endDateTime=%s", ELERING_URL, startDateTime, endDateTime);
+            List<EleringData> fetchedData = fetchDataFromEleringApi(url, currentDate);
+            combinedData.addAll(fetchedData);
+            }
+        return combinedData;
     }
 
     public List<EleringData> fetchDataFromEleringApi(String url, LocalDate date) {
@@ -69,4 +82,5 @@ public class EleringApiService {
         eleringDataRepository.saveAll(eleringDataList);
         return eleringDataList;
     }
+
 }

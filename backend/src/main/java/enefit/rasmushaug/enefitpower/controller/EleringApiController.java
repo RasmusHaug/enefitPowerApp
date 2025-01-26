@@ -25,11 +25,17 @@ public class EleringApiController {
 
     @GetMapping("/fetch-elering-today")
     public ResponseEntity<List<EleringData>> fetchEleringToday() {
-        return ResponseEntity.ok(eleringApiService.fetchDataAndStoreToday());
+        return ResponseEntity.ok(eleringApiService.fetchEleringData());
     }
 
     @GetMapping("/fetch-elering-date")
     public ResponseEntity<List<EleringData>> fetchEleringDate(@RequestParam LocalDate date) {
-        return ResponseEntity.ok(eleringApiService.fetchDataAndStoreDate(date));
+        return ResponseEntity.ok(eleringApiService.fetchEleringData(date));
     }
+
+    @GetMapping("/fetch-elering-date-range")
+    public ResponseEntity<List<EleringData>> fetchEleringDateRange(@RequestParam LocalDate fromDate, @RequestParam LocalDate endDate) {
+        return ResponseEntity.ok(eleringApiService.fetchEleringData(fromDate, endDate));
+    }
+    
 }
