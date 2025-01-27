@@ -1,10 +1,14 @@
 package enefit.rasmushaug.enefitpower.model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 /**
@@ -31,6 +35,9 @@ public class Customer {
     @Column(unique = true)
     private String username;
     private String password;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MeteringPoints> meteringPoints;
 
     /**
      * Returns a string representation of the customer object.
@@ -96,6 +103,10 @@ public class Customer {
         return username;
     }
 
+    public List<MeteringPoints> getMeteringPoints() {
+        return meteringPoints;
+    }
+
     // SETTERS
     /**
      * Sets the unique ID of the customer.
@@ -140,5 +151,9 @@ public class Customer {
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setMeteringPoints(List<MeteringPoints> meteringPoints) {
+        this.meteringPoints = meteringPoints;
     }
 }
