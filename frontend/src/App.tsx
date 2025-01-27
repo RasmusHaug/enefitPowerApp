@@ -27,8 +27,6 @@ const App: React.FC = () => {
         { name: 'Aruanded', current: false },
     ];
     const userNavigation = [
-        { name: 'Sinu Konto' },
-        { name: 'Seaded' },
         { name: 'Logi välja', onclick: () => logoutCustomer() },
     ];
 

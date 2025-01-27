@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
+import { useUser } from './UserContext';
 
 interface RegisterState {
     firstName: string;
@@ -19,6 +20,7 @@ const Register: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const navigate = useNavigate();
+    const { setUser } = useUser();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -33,39 +35,42 @@ const Register: React.FC = () => {
         e.preventDefault();
         setErrorMessage(null);
 
-        try {
-            const response = await fetch('http://localhost:8080/api/customers/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(registerState),
-            });
-
-            if (!response.ok) {
-                if (response.status === 400) {
-                    setErrorMessage('Invalid data. Please check your inputs.');
-                } else {
-                    setErrorMessage('An error occurred while trying to register. Please try again later.');
-                }
-                return;
-            }
-            // On successfull registration for user experience log them in as well.
-            const loginResponse = await fetch('http://localhost:8080/api/customers/login', {
-                method: 'POST',
-                headers: {
+    try {
+        const response = await fetch('http://localhost:8080/api/customers/register', {
+            method: 'POST',
+            headers: {
                 'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                username: registerState.username,
-                password: registerState.password,
-                }),
-            });
-            if (!loginResponse.ok) {
-                setErrorMessage('Login failed after registration.');
-                return;
+            },
+            body: JSON.stringify(registerState),
+        });
+
+        if (!response.ok) {
+            if (response.status === 400) {
+                setErrorMessage('Invalid data. Please check your inputs.');
+            } else {
+                setErrorMessage('An error occurred while trying to register. Please try again later.');
             }
-            navigate('/dashboard');
+            return;
+        }
+        // On successfull registration for user experience log them in as well.
+        const loginResponse = await fetch('http://localhost:8080/api/customers/login', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+            username: registerState.username,
+            password: registerState.password,
+            }),
+        });
+        if (!loginResponse.ok) {
+            setErrorMessage('Login failed after registration.');
+            return;
+        }
+        const data = await loginResponse.json();
+        setUser(data);
+        alert("Kasutaja edukalt registreeritud!");
+        navigate('/dashboard');
 
         } catch (error) {
             console.error("Error during registration:", error);

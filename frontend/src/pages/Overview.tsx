@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, } from 'recharts';
 import dayjs from 'dayjs';
-import { Switch } from '@headlessui/react';
 
 interface DataEntry {
     date: string;
@@ -15,7 +14,6 @@ const Overview: React.FC = () => {
     const [data, setData] = useState<DataEntry[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [showMwH, setShowMwH] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -63,7 +61,7 @@ const Overview: React.FC = () => {
 
     return (
         <div className="p-5 bg-slate-900 rounded-md">
-            <h1 className="text-2xl font-bold text-white mb-4">Päeva keskmine Elektri hind (Viimased 7. päeva)</h1>
+            <h1 className="text-2xl font-bold text-white mb-4">Päeva keskmine Elektri hind sent KwH kohta (Viimased 7. päeva)</h1>
             <ResponsiveContainer width="100%" height={400}>
                 <BarChart
                 data={data}

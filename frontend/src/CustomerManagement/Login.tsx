@@ -31,13 +31,6 @@ const Login: React.FC = () => {
         setErrorMessage(null);
 
         try {
-            console.log('Sending login request:', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(loginState),
-            });
             const response = await fetch('http://localhost:8080/api/customers/login', {
                 method: 'POST',
                 headers: {
@@ -57,8 +50,7 @@ const Login: React.FC = () => {
             }
             const data = await response.json();
             setUser(data);
-            console.log(data);
-            alert("Login successful!");
+            alert("Leidsime kasutaja!");
             navigate('/dashboard');
         } catch (error) {
             console.error("Error during logion:", error);
