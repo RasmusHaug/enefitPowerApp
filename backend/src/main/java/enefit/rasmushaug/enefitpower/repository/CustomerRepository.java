@@ -8,9 +8,7 @@ import enefit.rasmushaug.enefitpower.model.Customer;
 /**
  * Repository interface for accessing customer data from the database.
  *
- * This interface extends {@link JpaRepository} and provides CRUD operations and custom queries
- * for the `Customer` entity. It allows the application to perform database operations.
- *
+ * This interface extends {@link JpaRepository}.
  * The interface includes a method to find a customer by their username.
  */
 @Repository

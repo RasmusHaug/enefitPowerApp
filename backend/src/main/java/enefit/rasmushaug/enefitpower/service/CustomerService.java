@@ -73,10 +73,22 @@ public class CustomerService {
         return null;
     }
 
+    /**
+     * Getter to find Customer using customer Username.
+     *
+     * @param username The username used to search for excisting customers
+     * @return Customer full data if it excists.
+     */
     public Customer getCustomerByUsername(String username) {
         return customerRepository.findByUsername(username);
     }
 
+    /**
+     * Getter to find Customer using Customer ID value.
+     *
+     * @param customerId The Customer ID used to search for excisitn customers
+     * @return Customer object if excists that can be used to access Customer specific details.
+     */
     public Customer getCustomerById(Long customerId) {
         return customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + customerId));
     }
