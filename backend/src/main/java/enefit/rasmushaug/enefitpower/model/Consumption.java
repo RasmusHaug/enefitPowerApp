@@ -2,6 +2,8 @@ package enefit.rasmushaug.enefitpower.model;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +22,7 @@ public class Consumption {
 
     @ManyToOne
     @JoinColumn(name = "metering_point_id", nullable = false)
+    @JsonBackReference
     private MeteringPoints meteringPoint;
 
     private Double amount;
@@ -28,6 +31,17 @@ public class Consumption {
     @Column(name = "consumption_time")
     private Timestamp consumptionTime;
 
+    @Override
+    public String toString() {
+        return "Consumption{" +
+            "consumptionId=" + consumptionId +
+            ", meteringPoint=" + (meteringPoint != null ? meteringPoint.getMeteringPointId() : "null") +
+            ", amount=" + amount +
+            ", amountUnit='" + amountUnit + '\'' +
+            ", consumptionTime=" + consumptionTime +
+            '}';
+    }
+    
     // GETTERS
     public Double getAmount() {
         return amount;
