@@ -13,13 +13,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import enefit.rasmushaug.enefitpower.config.JwtUtil;
 import enefit.rasmushaug.enefitpower.dto.CustomerResponse;
 import enefit.rasmushaug.enefitpower.dto.CustomerResponseError;
 import enefit.rasmushaug.enefitpower.model.Customer;
 import enefit.rasmushaug.enefitpower.repository.CustomerRepository;
 import enefit.rasmushaug.enefitpower.service.CustomerService;
-import jakarta.servlet.http.HttpSession;
 
 /**
  * Controller for handling customer account operations.
@@ -40,9 +38,6 @@ public class CustomerAccountController {
 
     @Autowired
     private CustomerRepository customerRepository;
-
-    @Autowired
-    private JwtUtil jwtUtil;
 
     /**
      *

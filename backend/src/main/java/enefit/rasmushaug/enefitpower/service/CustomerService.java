@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import enefit.rasmushaug.enefitpower.config.JwtUtil;
+import enefit.rasmushaug.enefitpower.components.JwtUtil;
 import enefit.rasmushaug.enefitpower.model.Customer;
 import enefit.rasmushaug.enefitpower.repository.CustomerRepository;
 
@@ -71,5 +71,13 @@ public class CustomerService {
             logger.info("Failed login for {}", customer.getUsername());
         }
         return null;
+    }
+
+    public Customer getCustomerByUsername(String username) {
+        return customerRepository.findByUsername(username);
+    }
+
+    public Customer getCustomerById(Long customerId) {
+        return customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + customerId));
     }
 }
