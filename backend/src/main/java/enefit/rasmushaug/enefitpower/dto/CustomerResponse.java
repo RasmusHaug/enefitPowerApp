@@ -23,6 +23,22 @@ public class CustomerResponse {
      * CustomerResponse DTO for use in API responses.
      *
      * @param customer The customer entity to extract data from.
+     * @param jwtToken The JWT token for the customer session.
+     */
+    public CustomerResponse(Customer customer, String jwtToken) {
+        this.customerId = customer.getCustomerId();
+        this.firstName = customer.getFirstName();
+        this.lastName = customer.getLastName();
+        this.username = customer.getUsername();
+        this.sessionId = jwtToken;
+    }
+
+    /**
+     * Same as above constructor but doesn't require `jwtToken` as parameter.
+     * This is only called when a new customer registers.
+     * When they log into their account the correct constructor will be used.
+     *
+     * @param customer The customer entity to extract data from.
      */
     public CustomerResponse(Customer customer) {
         this.customerId = customer.getCustomerId();

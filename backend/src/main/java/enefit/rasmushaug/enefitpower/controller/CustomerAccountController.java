@@ -8,13 +8,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import enefit.rasmushaug.enefitpower.config.JwtUtil;
 import enefit.rasmushaug.enefitpower.dto.CustomerResponse;
 import enefit.rasmushaug.enefitpower.dto.CustomerResponseError;
-import enefit.rasmushaug.enefitpower.dto.LoginRequest;
 import enefit.rasmushaug.enefitpower.model.Customer;
+import enefit.rasmushaug.enefitpower.repository.CustomerRepository;
 import enefit.rasmushaug.enefitpower.service.CustomerService;
 import jakarta.servlet.http.HttpSession;
 
@@ -34,6 +37,12 @@ public class CustomerAccountController {
 
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     /**
      *
@@ -79,42 +88,31 @@ public class CustomerAccountController {
      *              and 401 Unauthorized if the credentials are invalid.
      */
     @PostMapping("/login")
-    public ResponseEntity<CustomerResponse> loginCustomer(@RequestBody LoginRequest loginRequest, HttpSession session) {
-        Customer customer = customerService.login(loginRequest.getUsername(), loginRequest.getPassword());
-        if (customer != null) {
-            CustomerResponse sessionCustomer = new CustomerResponse(customer);
-            session.setAttribute("user", sessionCustomer.getCustomerId());
-            sessionCustomer.setSessionId(session.getId());
-            logger.info("User logged in successfully: {}", sessionCustomer);
-            return ResponseEntity.ok(sessionCustomer);
+    public ResponseEntity<CustomerResponse> loginCustomer(@RequestBody Map<String, String> credentials) {
+        String username = credentials.get("username");
+        String password = credentials.get("password");
+        String jwtToken = customerService.login(username, password);
+        if (jwtToken != null) {
+            Customer customer = customerRepository.findByUsername(username);
+            if (customer != null) {
+                CustomerResponse sessionCustomer = new CustomerResponse(customer, jwtToken);
+                logger.info("User logged in successfully: {}", sessionCustomer);
+                return ResponseEntity.ok(sessionCustomer);
+            }
         }
         return ResponseEntity.status(401).body(null);
     }
 
     /**
-     * Logs out an existing customer.
+     * Method to just return a String the customer has logged out.
+     * Client side is responsible for deleting the session token.
      *
-     * This API endpoint allows customers to log out by invalidating their session.
-     *
-     * @param session The HTTP session to invalidate.
      * @return ResponseEntity<String> A responseEntity with a logout success message.
      *         Returns HTTP 200 OK on successful logout.
      */
     @PostMapping("/logout")
-    public ResponseEntity<String> logoutCustomer(@RequestBody String sessionId, HttpSession session) {
-        String cleanedSessionId = sessionId.replace("\"", "").trim();
-        try {
-            if (cleanedSessionId.equals(session.getId())) {
-                session.invalidate();
-                logger.info("Successfully logged out customer with session ID {}", cleanedSessionId);
-                return ResponseEntity.ok("Logged out successfully.");
-            }
-            logger.warn("Invalid session ID provided for logout: {}", cleanedSessionId);
-            return ResponseEntity.status(401).body("Invalid session ID.");
-        } catch (Exception e) {
-            logger.error("Error during logout: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body("Unexpected error during logout.");
-        }
+    public ResponseEntity<String> logoutCustomer() {
+        return ResponseEntity.ok("Logged out successfully.");
     }
 
 

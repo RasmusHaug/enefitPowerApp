@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import enefit.rasmushaug.enefitpower.config.JwtUtil;
 import enefit.rasmushaug.enefitpower.model.Customer;
 import enefit.rasmushaug.enefitpower.repository.CustomerRepository;
 
@@ -22,6 +23,9 @@ public class CustomerService {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final Logger logger = LoggerFactory.getLogger(CustomerService.class);
@@ -56,10 +60,10 @@ public class CustomerService {
      * @return Customer The Customer full data if sucessfully logged in.
      *         Returns null if the username and/or password don't match to data in database.
      */
-    public Customer login(String username, String password) {
+    public String login(String username, String password) {
         Customer customer = customerRepository.findByUsername(username);
         if (customer != null && passwordEncoder.matches(password, customer.getPassword())) {
-            return customer;
+            return jwtUtil.generatedToken(username);
         }
         if (customer == null) {
             logger.info("Failed login attenot, username not found {}", username);
