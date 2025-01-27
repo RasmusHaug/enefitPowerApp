@@ -3,6 +3,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useUser } from './UserContext'
+import windTurbinesOnField from '../assets/wind_turbines_on_field.mp4'
 
 
 interface LoginState {
@@ -60,7 +61,12 @@ const Login: React.FC = () => {
 
     return (
         <div className="bg-slate-800 h-[100vh] text-white flex justify-center items-center">
-            <div className="bg-slate-800 border border-slate-400 rounded-md p-8 ">
+            <div className='absolute opacity-70'>
+                <video autoPlay loop muted>
+                    <source src={windTurbinesOnField} type='video/mp4'/>
+                </video>
+            </div>
+            <div className="relative bg-slate-800 border border-slate-400 rounded-md p-8 shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-70">
                 <div>
                     <h1 className='text-4xl font-bold text-center mb-6'>Enefit Power App</h1>
 
@@ -85,9 +91,6 @@ const Login: React.FC = () => {
                             <div>
                                 <div className='flex items-center justify-between'>
                                     <label htmlFor='password' className='block text-sm/6 font-medium'>Parool</label>
-                                    <div className='text-sm'>
-                                        <a href="#" className='font-semibold text-white hover:text-emerald-400'>Unustasid Parooli?</a>
-                                    </div>
                                 </div>
                                 <div>
                                     <div className='relative'>
@@ -127,7 +130,7 @@ const Login: React.FC = () => {
                     </div>
                 </div>
             </div>
-    </div>
+        </div>
     );
 };
 

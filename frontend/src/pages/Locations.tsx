@@ -1,32 +1,42 @@
 import React, { useEffect, useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import dayjs from 'dayjs';
+
 import { useUser } from '../CustomerManagement/UserContext';
 
 // TODO: Add option to delete Locations.
 
 interface MeteringPoint {
-    id: number;
+    meteringPointId: number;
     name: string;
     address: string;
     city: string;
     postalCode: string;
 }
 
+interface Consumption {
+    amount: number;
+    amountUnit: string;
+    date: string;
+}
+
 const Locations: React.FC = () => {
     const [meteringPoints, setMeteringPoints] = useState<MeteringPoint[]>([]);
+    const [consumptions, setConsumptions] = useState<{ [key: number]: Consumption[] }>({});
+    const [isAdding, setIsAdding] = useState(false);
     const [newMeteringPoint, setNewMeteringPoint] = useState({
             name: '',
             address: '',
             city: '',
             postalCode: '',
     });
-    const [isAdding, setIsAdding] = useState(false);
     const { user } = useUser();
     const customerId = user?.customerId;
     const token = user?.sessionId;
 
     const fetchMeteringPoints = async () => {
         try {
-            const response = await fetch( `http://localhost:8080/api/customers/${customerId}/get-metering-points`, {
+            const response = await fetch(`http://localhost:8080/api/customers/${customerId}/get-metering-points`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,13 +51,45 @@ const Locations: React.FC = () => {
 
             const data = await response.json();
             setMeteringPoints(data);
+            fetchConsumptions(data);
         } catch (error) {
             console.error('Error fetching metering points:', error);
         }
     };
 
-    const handleAddNew = () => {
-        setIsAdding(true);
+    const fetchConsumptions = async (meteringPoints: MeteringPoint[]) => {
+        try {
+            const consumptionPromises = meteringPoints.map((point) => {
+                const endDate = dayjs().format('YYYY-MM-DD');
+                const fromDate = dayjs().subtract(7, 'day').format('YYYY-MM-DD');
+
+                return fetch(
+                    `http://localhost:8080/api/customers/${customerId}/metering-points/${point.meteringPointId}/consumptions?fromDate=${fromDate}&endDate=${endDate}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
+                        },
+                        credentials: 'include',
+                    }
+                )
+                .then((response) => response.json())
+                .then((data) => {
+                    setConsumptions((prev) => ({
+                        ...prev,
+                        [point.meteringPointId]: data,
+                    }));
+                })
+                .catch((error) => {
+                    console.error('Error fetching consumption:', error);
+                });
+            });
+
+            await Promise.all(consumptionPromises);
+        } catch (error) {
+            console.error('Error in fetching consumptions:', error);
+        }
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,6 +99,10 @@ const Locations: React.FC = () => {
         [name]: value,
         }));
     };
+
+    useEffect(() => {
+        fetchMeteringPoints();
+    }, []);
 
     const addMeteringPoint = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -84,13 +130,13 @@ const Locations: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        fetchMeteringPoints();
-    }, []);
+    const handleAddNew = () => {
+        setIsAdding(true);
+    };
 
     return (
         <div className="p-3 bg-slate-900 rounded-md">
-            <div className="m-2 p-2 flex justify-between items-center">
+                        <div className="m-2 p-2 flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-white">Salvestatud eluasemed</h1>
                 <button
                 onClick={handleAddNew}
@@ -168,18 +214,49 @@ const Locations: React.FC = () => {
                     </div>
                 </div>
             )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="flex flex-col gap-4">
                 {meteringPoints.map((point) => (
-                    <div key={point.id} className="p-4 bg-slate-800 rounded-md">
-                        <h3 className="text-lg font-bold text-white">{point.name}</h3>
-                        <p className="text-gray-400">{point.address}</p>
-                        <p className="text-gray-400">
-                        {point.city}, {point.postalCode}
-                        </p>
+                    <div key={point.meteringPointId} className="p-4 bg-slate-800 rounded-md flex justify-between items-center">
+                        <div className="flex-1 min-w-[100px] max-w-[300px]">
+                            <h2 className="text-lg font-bold text-white">{point.name}</h2>
+                            <p className="text-gray-400">{point.address}</p>
+                            <p className="text-gray-400">
+                                {point.city}, {point.postalCode}
+                            </p>
+                        </div>
+                        <div className="flex-1 relative">
+                            {consumptions[point.meteringPointId] && consumptions[point.meteringPointId].length > 0 ? (
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <BarChart
+                                        data={consumptions[point.meteringPointId].map((entry) => ({
+                                            date: entry.date,
+                                            amount: entry.amount,
+                                        }))}
+                                        margin={{
+                                            top: 5,
+                                            right: 30,
+                                            left: 20,
+                                            bottom: 5,
+                                        }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="date" tick={{ fill: 'white' }} />
+                                        <YAxis tick={{ fill: 'white' }} />
+                                        <Tooltip 
+                                            contentStyle={{ backgroundColor: '#0f172a', border: '2px solid #334155' }}
+                                            formatter={(value) => [`${value} kWh`, 'kulu']}
+                                            />
+                                        <Bar dataKey="amount" fill="#047857" radius={[5, 5, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <p className="text-gray-400">Ei ole andmeid viimase 7 päeva kohta</p>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
+
         </div>
     );
 };
