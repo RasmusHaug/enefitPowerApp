@@ -43,6 +43,7 @@ public class EleringData {
         this.eurPerMwhVat = eurPerMwhVat;
         this.fromDateTime = fromDateTime;
         this.toDateTime = toDateTime;
+        this.date = fromDateTime.toLocalDate();
     }
 
     @Override
