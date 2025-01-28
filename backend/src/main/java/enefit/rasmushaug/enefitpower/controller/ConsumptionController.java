@@ -60,6 +60,7 @@ public class ConsumptionController {
      */
     @PostMapping("/{customerId}/add-consumptions")
     public ResponseEntity<?> addConsumption(@PathVariable Long customerId, @RequestBody Consumption consumption, @RequestHeader("Authorization") String token) {
+        logger.info("\nConsumption Object Received: {}", consumption);
         String loggedInUsername = jwtUtil.extractUsername(token.replace("Bearer ", ""));
         Customer loggedInCustomer = customerService.getCustomerByUsername(loggedInUsername);
 
@@ -68,7 +69,6 @@ public class ConsumptionController {
             return ResponseEntity.status(403).body("You are not authorized to add consumption.");
         }
 
-        logger.info("Consumption Object sent: {}", consumption);
         MeteringPoints meteringPoint = consumption.getMeteringPoint();
         if (meteringPoint == null) {
             logger.error("Metering point is null for customer '{}'", customerId);
