@@ -17,14 +17,14 @@ return classes.filter(Boolean).join(' ');
 const App: React.FC = () => {
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [activeNav, setActiveNav] = useState<string>('Ülevaade');
+    const [activeNav, setActiveNav] = useState<string>('Elektri Börs');
 
     const { user } = useUser();
 
     const navigation = [
-        { name: 'Ülevaade', current: true },
-        { name: 'Eluasemed', current: false },
-        { name: 'Aruanded', current: false },
+        { name: 'Elektri Börs', current: true },
+        { name: 'Tarbimine', current: false },
+        { name: 'Kulud', current: false },
     ];
     const userNavigation = [
         { name: 'Logi välja', onclick: () => logoutCustomer() },
@@ -72,11 +72,11 @@ const App: React.FC = () => {
 
     const renderContent = () => {
         switch (activeNav) {
-            case 'Ülevaade':
+            case 'Elektri Börs':
                 return <Overview />;
-            case 'Eluasemed':
+            case 'Tarbimine':
                 return <Calendar />;
-            case 'Aruanded':
+            case 'Kulud':
                 return <Reports />;
             default:
                 return null;
