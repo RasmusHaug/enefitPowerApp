@@ -2,7 +2,6 @@ package enefit.rasmushaug.enefitpower.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import enefit.rasmushaug.enefitpower.dto.CustomerResponse;
-import enefit.rasmushaug.enefitpower.dto.CustomerResponseError;
 import enefit.rasmushaug.enefitpower.model.Customer;
 import enefit.rasmushaug.enefitpower.repository.CustomerRepository;
 import enefit.rasmushaug.enefitpower.service.CustomerService;
@@ -52,20 +50,25 @@ public class CustomerAccountController {
      *              Returns HTTP status 400 on IllegalArgumentException with error message.
      */
     @PostMapping("/register")
-    public ResponseEntity<CustomerResponse> registerCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<?> registerCustomer(@RequestBody Customer customer) {
         try {
-            Customer createdCustomer = customerService.registerCustomer(customer);
-            if (createdCustomer == null) {
-                logger.error("Customer creation failed for: {}", customer);
-                return ResponseEntity.status(500).body(new CustomerResponseError("Registration Failed"));
+            if (Boolean.TRUE.equals(customerRepository.existsByUsername(customer.getUsername()))) {
+                logger.error("Username '{}' already taken.", customer.getUsername());
+                return ResponseEntity.status(500).body("Username already taken");
+            } else {
+                Customer createdCustomer = customerService.registerCustomer(customer);
+                if (createdCustomer == null) {
+                    logger.error("Customer creation failed for: {}", customer);
+                    return ResponseEntity.status(500).body("Registration Failed");
+                }
+                return ResponseEntity.ok(new CustomerResponse(createdCustomer));
             }
-            return ResponseEntity.ok(new CustomerResponse(createdCustomer));
         } catch (IllegalArgumentException e) {
             logger.error("Error registering customer: {}", e.getMessage());
-            return ResponseEntity.status(400).body(new CustomerResponseError(e.getMessage()));
+            return ResponseEntity.status(400).body(e.getMessage());
         } catch (Exception e) {
             logger.error("Unexpected error during registration: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body(new CustomerResponseError("Unexpected Error: " + e.getMessage()));
+            return ResponseEntity.status(500).body("Unexpected Error: " + e.getMessage());
         }
     }
 
@@ -83,7 +86,7 @@ public class CustomerAccountController {
      *              and 401 Unauthorized if the credentials are invalid.
      */
     @PostMapping("/login")
-    public ResponseEntity<CustomerResponse> loginCustomer(@RequestBody Map<String, String> credentials) {
+    public ResponseEntity<?> loginCustomer(@RequestBody Map<String, String> credentials) {
         String username = credentials.get("username");
         String password = credentials.get("password");
         String jwtToken = customerService.login(username, password);
@@ -93,9 +96,14 @@ public class CustomerAccountController {
                 CustomerResponse sessionCustomer = new CustomerResponse(customer, jwtToken);
                 logger.info("User logged in successfully: {}", sessionCustomer);
                 return ResponseEntity.ok(sessionCustomer);
+            } else {
+                logger.error("Failed to located user using credentials: '{}'", credentials);
+                return ResponseEntity.status(500).body("Faild to find customer");
             }
+        } else {
+            logger.error("Failed to create JWT Token for Customer using credentials '{}'", credentials);
+            return ResponseEntity.status(401).body("Login failed.");
         }
-        return ResponseEntity.status(401).body(null);
     }
 
     /**
@@ -108,14 +116,5 @@ public class CustomerAccountController {
     @PostMapping("/logout")
     public ResponseEntity<String> logoutCustomer() {
         return ResponseEntity.ok("Logged out successfully.");
-    }
-
-
-    /**
-     * Custom handler for username already taken exception
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<CustomerResponseError> handleUsernameTakenException(IllegalArgumentException ex) {
-        return ResponseEntity.status(400).body(new CustomerResponseError(ex.getMessage()));
     }
 }

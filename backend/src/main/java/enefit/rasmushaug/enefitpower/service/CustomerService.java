@@ -66,7 +66,7 @@ public class CustomerService {
             return jwtUtil.generatedToken(username);
         }
         if (customer == null) {
-            logger.info("Failed login attenot, username not found {}", username);
+            logger.info("Failed login attempt, username not found {}", username);
         } else {
             logger.info("Failed login for {}", customer.getUsername());
         }
