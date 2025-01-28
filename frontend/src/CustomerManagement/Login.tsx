@@ -42,10 +42,11 @@ const Login: React.FC = () => {
             });
 
             if (!response.ok) {
+                const errorData = await response.text();
                 if (response.status === 401) {
-                    setErrorMessage('Invalid username or password');
+                    setErrorMessage(errorData || 'Invalid username or password');
                 } else {
-                    setErrorMessage('An error occurred while trying to connect to the server. Please try again later.')
+                    setErrorMessage(errorData || 'An error occurred while trying to connect to the server. Please try again later.')
                 }
                 return;
             }

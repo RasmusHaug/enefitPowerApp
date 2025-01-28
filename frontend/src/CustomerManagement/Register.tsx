@@ -37,48 +37,49 @@ const Register: React.FC = () => {
         e.preventDefault();
         setErrorMessage(null);
 
-    try {
-        const response = await fetch('http://localhost:8080/api/customers/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(registerState),
-        });
+        try {
+            const response = await fetch('http://localhost:8080/api/customers/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(registerState),
+            });
 
-        if (!response.ok) {
-            if (response.status === 400) {
-                setErrorMessage('Invalid data. Please check your inputs.');
-            } else {
-                setErrorMessage('An error occurred while trying to register. Please try again later.');
+            if (!response.ok) {
+                const errorData = await response.text();
+                if (response.status === 400) {
+                    setErrorMessage(errorData || 'Invalid data. Please check your inputs.');
+                } else {
+                    setErrorMessage(errorData || 'An error occurred while trying to register. Please try again later.');
+                }
+                return;
             }
-            return;
-        }
-        // On successfull registration for user experience log them in as well.
-        const loginResponse = await fetch('http://localhost:8080/api/customers/login', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-            username: registerState.username,
-            password: registerState.password,
-            }),
-        });
-        if (!loginResponse.ok) {
-            setErrorMessage('Login failed after registration.');
-            return;
-        }
-        const data = await loginResponse.json();
-        setUser(data);
-        alert("Kasutaja edukalt registreeritud!");
-        navigate('/dashboard');
+            // On successfull registration for user experience log them in as well.
+            const loginResponse = await fetch('http://localhost:8080/api/customers/login', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                username: registerState.username,
+                password: registerState.password,
+                }),
+            });
+            if (!loginResponse.ok) {
+                setErrorMessage('Login failed after registration.');
+                return;
+            }
+            const data = await loginResponse.json();
+            setUser(data);
+            alert("Kasutaja edukalt registreeritud!");
+            navigate('/dashboard');
 
-        } catch (error) {
-            console.error("Error during registration:", error);
-            setErrorMessage("An error occurred while trying to connect to the server. Please try again later.");
-        }
-    };
+            } catch (error) {
+                console.error("Error during registration:", error);
+                setErrorMessage("An error occurred while trying to connect to the server. Please try again later.");
+            }
+        };
 
     return (
         <div className='bg-slate-800 h-[100vh] text-white flex justify-center items-center'>
@@ -128,7 +129,7 @@ const Register: React.FC = () => {
 
                         <div>
                             <label htmlFor="username" className="block text-sm font-medium text-white">
-                                Emaili aadress
+                                Kasutajanimi
                             </label>
                             <div className="mt-2">
                                 <input
