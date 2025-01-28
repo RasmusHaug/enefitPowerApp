@@ -14,4 +14,6 @@ import enefit.rasmushaug.enefitpower.model.Customer;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Customer findByUsername(String username);
+
+    Boolean existsByUsername(String username);
 }
