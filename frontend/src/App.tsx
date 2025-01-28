@@ -38,28 +38,33 @@ const App: React.FC = () => {
 
     const logoutCustomer = async () => {
         try {
-        const response = await fetch('http://localhost:8080/api/customers/logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(user?.sessionId),
-            credentials: 'include',
-        });
+            const response = await fetch('http://localhost:8080/api/customers/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user?.sessionId),
+                credentials: 'include',
+            });
 
-        if (response.ok) {
-            console.log('Logout successful');
-            alert('You have been logged out successfully.');
-            navigate('/');
-        } else {
-            console.error('Failed to log out');
-            alert('Logout failed. Please try again later.');
-        }
+            if (response.ok) {
+                console.log('Logout successful');
+                alert('You have been logged out successfully.');
+
+                localStorage.removeItem('jwtToken');
+                sessionStorage.removeItem('jwtToken');
+
+                navigate('/');
+            } else {
+                console.error('Failed to log out');
+                alert('Logout failed. Please try again later.');
+            }
         } catch (error) {
-        console.error('Error during logout:', error);
-        setErrorMessage('An error occurred while logging out. Please try again later.');
+            console.error('Error during logout:', error);
+            setErrorMessage('An error occurred while logging out. Please try again later.');
         }
     };
+
 
     const handleNavClick = (name: string) => {
         setActiveNav(name);
