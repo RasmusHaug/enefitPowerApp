@@ -142,47 +142,71 @@ const Locations: React.FC = () => {
 
     const addNewConsumption = async (e: React.FormEvent) => {
         e.preventDefault();
-        try {
-            const consumptionData = {
-                ...newConsumptionData,
-                amount: parseFloat(newConsumptionData.amount),
-                amountUnit: 'kWh',
-                meteringPoint: { meteringPointId: parseInt(newConsumptionData.meteringPoint, 10), }
-            };
-            const response = await fetch( `http://localhost:8080/api/customers/${customerId}/add-consumptions`, {
-                method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify(consumptionData),
-            });
 
-            if (!response.ok) {
-                throw new Error("Failed to add new consumption point.")
+        const { meteringPoint, amount, consumptionTime } = newConsumptionData;
+        const newAmount = parseFloat(amount);
+        const consumptionDate = dayjs(consumptionTime).format('YYYY-MM-DD');
+
+        try {
+            const existingConsumptions = consumptions[meteringPoint] || [];
+            const existingConsumption = existingConsumptions.find(
+                (consumption) => dayjs(consumption.consumptionTime).format('YYYY-MM-DD') === consumptionDate
+            );
+
+            if (existingConsumption) {
+                existingConsumption.amount += newAmount;
+                setConsumptions((prev) => ({
+                    ...prev,
+                    [meteringPoint]: [...existingConsumptions],
+                }));
+            } else {
+                const consumptionData = {
+                    meteringPoint: { meteringPointId: parseInt(meteringPoint, 10) },
+                    amount: newAmount,
+                    amountUnit: 'kWh',
+                    consumptionTime: consumptionTime,
+                };
+
+                const response = await fetch(
+                    `http://localhost:8080/api/customers/${customerId}/add-consumptions`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(consumptionData),
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to add new consumption.");
+                }
+
+                const addedConsumption = await response.json();
+                setConsumptions((prev) => ({
+                    ...prev,
+                    [meteringPoint]: [...(prev[meteringPoint] || []), addedConsumption],
+                }));
             }
 
-            const addedConsumption = await response.json();
-            setConsumptions((prev) => ({
-                ...prev,
-                [newConsumptionData.meteringPoint]: [...(prev[newConsumptionData.meteringPoint] || []), addedConsumption],
-            }));
             setNewConsumptionData({
                 meteringPoint: '',
                 amount: '',
                 amountUnit: '',
                 consumptionTime: '',
             });
-            setIsAddingConsumption(false)
+            setIsAddingConsumption(false);
         } catch (error) {
             console.error('Error adding consumption:', error);
         }
-    }
+    };
+
     const handleAddNewConsumption = (meteringPointId: number) => {
         setNewConsumptionData((prev) => ({
             ...prev,
-            meteringPoint: meteringPointId.toString(),  // Set meteringPointId here
+            meteringPoint: meteringPointId.toString(),
         }));
         setIsAddingConsumption(true);
     }
@@ -295,7 +319,7 @@ const Locations: React.FC = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium">Kuupäev ja kell millal</label>
+                                <label className="block text-sm font-medium">Kuupäev kulutatud</label>
                                 <input
                                     type="date"
                                     name="consumptionTime"
