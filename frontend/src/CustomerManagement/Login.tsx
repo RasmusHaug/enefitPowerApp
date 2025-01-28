@@ -61,7 +61,7 @@ const Login: React.FC = () => {
 
     return (
         <div className="bg-slate-800 h-[100vh] text-white flex justify-center items-center">
-            <div className='absolute opacity-70'>
+            <div className='absolute opacity-70 w-[100vw]'>
                 <video autoPlay loop muted>
                     <source src={windTurbinesOnField} type='video/mp4'/>
                 </video>
