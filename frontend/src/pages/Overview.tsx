@@ -61,7 +61,7 @@ const Overview: React.FC = () => {
 
     return (
         <div className="p-5 bg-slate-900 rounded-md">
-            <h1 className="text-2xl font-bold text-white mb-4">Päeva keskmine Elektri hind sent KwH kohta (Viimased 7. päeva)</h1>
+            <h1 className="text-2xl font-bold text-white mb-4">Päeva keskmine Elektri hind sent kWh kohta (Viimased 7. päeva)</h1>
             <ResponsiveContainer width="100%" height={400}>
                 <BarChart
                 data={data}
@@ -77,6 +77,7 @@ const Overview: React.FC = () => {
                 <YAxis tick={{ fill: 'white' }} />
                 <Tooltip
                     contentStyle={{ backgroundColor: '#0f172a', border: '2px solid #334155'}}
+                    formatter={(value: number) => [`${value} senti kWh kohta`, 'hind']}
                 />
                 <Bar dataKey="centsPerKwh" fill="#047857" />
                 </BarChart>
