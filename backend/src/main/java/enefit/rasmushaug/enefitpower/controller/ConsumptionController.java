@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import enefit.rasmushaug.enefitpower.components.JwtUtil;
 import enefit.rasmushaug.enefitpower.dto.ConsumptionDTO;
 import enefit.rasmushaug.enefitpower.model.Consumption;
+import enefit.rasmushaug.enefitpower.model.Consumption.AmountUnit;
 import enefit.rasmushaug.enefitpower.model.Customer;
 import enefit.rasmushaug.enefitpower.model.MeteringPoints;
 import enefit.rasmushaug.enefitpower.service.ConsumptionService;
@@ -16,8 +17,11 @@ import enefit.rasmushaug.enefitpower.service.MeteringPointsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller for handling Consumption operations
@@ -115,18 +119,43 @@ public class ConsumptionController {
             return ResponseEntity.status(403).body("You are not authorized to view consumptions for this metering point.");
         }
 
+        List<ConsumptionDTO> dailyConsumptions = sumDailyConsumptions(meteringPoint.getConsumptionRecords());
+
+        logger.info("User '{}' fetched consumptions for location '{}'", loggedInUsername, meteringPointId);
+        return ResponseEntity.ok(dailyConsumptions);
+    }
+
+    private List<ConsumptionDTO> sumDailyConsumptions(List<Consumption> consumptions) {
+        Map<LocalDate, Double> summedConsumptions = new HashMap<>();
+        Map<LocalDate, Long> firstConsumptionIds = new HashMap<>();
+        Map<LocalDate, AmountUnit> firstAmountUnits = new HashMap<>();
+
+        for (Consumption consumption : consumptions) {
+            LocalDate consumptionDate = consumption.getConsumptionTime();
+
+            summedConsumptions.merge(consumptionDate, consumption.getAmount(), Double::sum);
+
+            firstConsumptionIds.putIfAbsent(consumptionDate, consumption.getConsumptionId());
+            firstAmountUnits.putIfAbsent(consumptionDate, consumption.getAmountUnit());
+        }
+
         List<ConsumptionDTO> consumptionDTOs = new ArrayList<>();
-        for (Consumption consumption : meteringPoint.getConsumptionRecords()) {
+        for (Map.Entry<LocalDate, Double> entry : summedConsumptions.entrySet()) {
+            LocalDate date = entry.getKey();
+            Double summedAmount = entry.getValue();
+
+            Long consumptionId = firstConsumptionIds.get(date);
+            AmountUnit amountUnit = firstAmountUnits.get(date);
+
             ConsumptionDTO consumptionDTO = new ConsumptionDTO(
-                consumption.getConsumptionId(),
-                consumption.getAmount(),
-                Consumption.AmountUnit.valueOf(consumption.getAmountUnit()),
-                consumption.getConsumptionTime()
+                    consumptionId,
+                    summedAmount,
+                    amountUnit,
+                    date
             );
             consumptionDTOs.add(consumptionDTO);
         }
 
-        logger.info("User '{}' fetched consumptions for location '{}'", loggedInUsername, meteringPointId);
-        return ResponseEntity.ok(consumptionDTOs);
+        return consumptionDTOs;
     }
 }

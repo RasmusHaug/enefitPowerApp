@@ -28,7 +28,7 @@ public class Consumption {
     private Double amount;
 
     @Enumerated(EnumType.STRING)
-    private String amountUnit;
+    private AmountUnit amountUnit;
 
     @Column(name = "consumption_time")
     private LocalDate consumptionTime;
@@ -36,7 +36,7 @@ public class Consumption {
     public Double getAmount() {
         return amount;
     }
-    public String getAmountUnit() {
+    public AmountUnit getAmountUnit() {
         return amountUnit;
     }
     public long getConsumptionId() {
@@ -52,7 +52,7 @@ public class Consumption {
     public void setAmount(Double amount) {
         this.amount = amount;
     }
-    public void setAmountUnit(String amountUnit) {
+    public void setAmountUnit(AmountUnit amountUnit) {
         this.amountUnit = amountUnit;
     }
     public void setConsumptionId(long consumptionId) {

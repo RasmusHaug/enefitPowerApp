@@ -66,11 +66,9 @@ const Locations: React.FC = () => {
     const fetchConsumptions = async (meteringPoints: MeteringPoint[]) => {
         try {
             const consumptionPromises = meteringPoints.map((point) => {
-                const endDate = dayjs().format('YYYY-MM-DD');
-                const fromDate = dayjs().subtract(7, 'day').format('YYYY-MM-DD');
 
                 return fetch(
-                    `http://localhost:8080/api/customers/${customerId}/metering-points/${point.meteringPointId}/consumptions?fromDate=${fromDate}&endDate=${endDate}`,
+                    `http://localhost:8080/api/customers/${customerId}/${point.meteringPointId}/get-consumptions`,
                     {
                         method: 'GET',
                         headers: {
@@ -98,18 +96,6 @@ const Locations: React.FC = () => {
         }
     };
 
-    const handleNewMeteringPointInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setNewMeteringPoint((prev) => ({
-        ...prev,
-        [name]: value,
-        }));
-    };
-
-    useEffect(() => {
-        fetchMeteringPoints();
-    }, []);
-
     const addMeteringPoint = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -136,10 +122,6 @@ const Locations: React.FC = () => {
         }
     };
 
-    const handleAddNewLocation = () => {
-        setIsAddingLocation(true);
-    };
-
     const addNewConsumption = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -148,48 +130,47 @@ const Locations: React.FC = () => {
         const consumptionDate = dayjs(consumptionTime).format('YYYY-MM-DD');
 
         try {
-            const existingConsumptions = consumptions[meteringPoint] || [];
-            const existingConsumption = existingConsumptions.find(
-                (consumption) => dayjs(consumption.consumptionTime).format('YYYY-MM-DD') === consumptionDate
-            );
+            const consumptionData = {
+                meteringPointId: parseInt(meteringPoint, 10),
+                amount: newAmount,
+                amountUnit: 'kWh',
+                consumptionTime: consumptionDate,
+            };
 
-            if (existingConsumption) {
-                existingConsumption.amount += newAmount;
-                setConsumptions((prev) => ({
-                    ...prev,
-                    [meteringPoint]: [...existingConsumptions],
-                }));
-            } else {
-                const consumptionData = {
-                    meteringPoint: { meteringPointId: parseInt(meteringPoint, 10) },
-                    amount: newAmount,
-                    amountUnit: 'kWh',
-                    consumptionTime: consumptionTime,
-                };
+            const response = await fetch(`http://localhost:8080/api/customers/${customerId}/${meteringPoint}/add-consumption`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                credentials: 'include',
+                body: JSON.stringify(consumptionData),
+            });
 
-                const response = await fetch(
-                    `http://localhost:8080/api/customers/${customerId}/add-consumptions`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${token}`,
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify(consumptionData),
-                    }
+            if (!response.ok) {
+                console.error(response.body)
+                throw new Error('Failed to add new consumption.');
+            }
+
+            const addedConsumption = await response.json();
+            setConsumptions((prev) => {
+                const existingConsumptions = prev[meteringPoint] || [];
+                const consumptionDate = dayjs(addedConsumption.consumptionTime).format('YYYY-MM-DD');
+
+                // Check if a record for the same date already exists
+                const updatedConsumptions = existingConsumptions.map((record) =>
+                    dayjs(record.consumptionTime).format('YYYY-MM-DD') === consumptionDate
+                        ? { ...record, amount: record.amount + addedConsumption.amount } // Sum amounts
+                        : record
                 );
 
-                if (!response.ok) {
-                    throw new Error("Failed to add new consumption.");
+                // If no existing record, add a new one
+                if (!updatedConsumptions.some(record => dayjs(record.consumptionTime).format('YYYY-MM-DD') === consumptionDate)) {
+                    updatedConsumptions.push(addedConsumption);
                 }
 
-                const addedConsumption = await response.json();
-                setConsumptions((prev) => ({
-                    ...prev,
-                    [meteringPoint]: [...(prev[meteringPoint] || []), addedConsumption],
-                }));
-            }
+                return { ...prev, [meteringPoint]: updatedConsumptions };
+            });
 
             setNewConsumptionData({
                 meteringPoint: '',
@@ -203,6 +184,14 @@ const Locations: React.FC = () => {
         }
     };
 
+    const handleNewMeteringPointInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setNewMeteringPoint((prev) => ({
+        ...prev,
+        [name]: value,
+        }));
+    };
+
     const handleAddNewConsumption = (meteringPointId: number) => {
         setNewConsumptionData((prev) => ({
             ...prev,
@@ -211,6 +200,10 @@ const Locations: React.FC = () => {
         setIsAddingConsumption(true);
     }
 
+    const handleAddNewLocation = () => {
+        setIsAddingLocation(true);
+    };
+
     const handleConsumptionInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNewConsumptionData((prev) => ({
@@ -218,6 +211,10 @@ const Locations: React.FC = () => {
             [name]: value,
         }));
     };
+
+    useEffect(() => {
+        fetchMeteringPoints();
+    }, []);
 
     return (
         <div className="p-3 bg-slate-900 rounded-md">
@@ -362,46 +359,18 @@ const Locations: React.FC = () => {
                         <div className="flex-1 relative">
                             {consumptions[point.meteringPointId] && consumptions[point.meteringPointId].length > 0 ? (
                                 <ResponsiveContainer width="100%" height={200}>
-                                    <BarChart
-                                        data={consumptions[point.meteringPointId]
-                                            .filter((entry) => {
-                                                const consumptionDate = dayjs(entry.consumptionTime);
-                                                const sevenDaysAgo = dayjs().subtract(7, 'days');
-                                                return consumptionDate.isAfter(sevenDaysAgo);
-                                            })
-                                            .sort((a, b) => dayjs(a.consumptionTime).isBefore(dayjs(b.consumptionTime)) ? -1 : 1)
-                                            .map((entry) => ({
-                                                date: dayjs(entry.consumptionTime).format('YYYY-MM-DD'),
-                                                amount: entry.amount,
-                                            }))
-                                        }
-                                        margin={{
-                                            top: 5,
-                                            right: 30,
-                                            left: 20,
-                                            bottom: 5,
-                                        }}
-                                    >
+                                    <BarChart data={consumptions[point.meteringPointId] } margin={{ top: 5, right: 30, left: 20, bottom: 5, }} >
                                         <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis
-                                            dataKey="date"
-                                            tick={{ fill: 'white' }}
-                                            tickFormatter={(date) => {
-                                                const parsedDate = new Date(date);
-                                                const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: '2-digit' };
-                                                return parsedDate.toLocaleDateString('en-GB', options);
-                                            }}
-                                        />
+                                        <XAxis dataKey="consumptionTime" tick={{ fill: 'white' }} reversed={true} />
                                         <YAxis tick={{ fill: 'white' }} />
                                         <Tooltip
                                             contentStyle={{ backgroundColor: '#0f172a', border: '2px solid #334155' }}
-                                            formatter={(value) => [`${value} kWh`, 'kulu']}
-                                        />
+                                            formatter={(value) => [`${value} kWh`, 'kulu']} />
                                         <Bar dataKey="amount" fill="#047857" radius={[5, 5, 0, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <p className="text-gray-400">Ei ole andmeid viimase 7 päeva kohta</p>
+                                <p className="text-gray-400">Ei ole andmeid.</p>
                             )}
                         </div>
                         <div>

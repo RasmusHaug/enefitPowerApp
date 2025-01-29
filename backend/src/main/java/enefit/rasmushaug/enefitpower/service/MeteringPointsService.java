@@ -23,6 +23,6 @@ public class MeteringPointsService {
     }
 
     public List<MeteringPoints> getMeteringPointsByCustomerId(Long customerId) {
-        return meteringPointsRepository.findByCustomerId(customerId);
+        return meteringPointsRepository.findByCustomer_CustomerId(customerId);
     }
 }

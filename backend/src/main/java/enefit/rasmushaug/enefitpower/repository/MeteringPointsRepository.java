@@ -13,6 +13,6 @@ import java.util.List;
  * The interface includes a method to find Metering point by Customer ID value.
  */
 public interface MeteringPointsRepository extends JpaRepository<MeteringPoints, Long> {
-    List<MeteringPoints> findByCustomerId(Long customerId);
+    List<MeteringPoints> findByCustomer_CustomerId(Long customerId);
     MeteringPoints findByMeteringPointId(Long meteringPointId);
 }
