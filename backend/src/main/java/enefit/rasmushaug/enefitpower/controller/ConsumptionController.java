@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 /**
  * Controller for handling Consumption operations
@@ -62,29 +64,27 @@ public class ConsumptionController {
     @PostMapping("/{customerId}/{meteringPointId}/add-consumption")
     public ResponseEntity<?> addConsumption(@PathVariable long customerId, @PathVariable long meteringPointId, @RequestBody Consumption consumption, @RequestHeader("Authorization") String token) {
         String loggedInUsername = jwtUtil.extractUsername(token.replace("Bearer ", ""));
-        Customer loggedInCustomer = customerService.getCustomerByUsername(loggedInUsername);
+        if (checkAuthorization(token, customerId) == null) {
+            MeteringPoints meteringPoint = meteringPointsService.getMeteringPointsByCustomerId(customerId).stream()
+                .filter(mp -> mp.getMeteringPointId() == meteringPointId)
+                .findFirst()
+                .orElse(null);
 
-        if (!loggedInCustomer.getCustomerId().equals(customerId)) {
-            logger.error("Unauthorized user '{}' with ID '{}' tried to add consumption for customer '{}'", loggedInUsername,loggedInCustomer.getCustomerId(), customerId);
-            return ResponseEntity.status(403).body("You are not authorized to add consumption.");
-        }
+            if (meteringPoint == null) {
+                logger.error("Metering point is null for customer '{}'", customerId);
+                return ResponseEntity.status(400).body("Metering point is required.");
+            }
 
-        MeteringPoints meteringPoint = meteringPointsService.getMeteringPointsByCustomerId(customerId).stream()
-            .filter(mp -> mp.getMeteringPointId() == meteringPointId)
-            .findFirst()
-            .orElse(null);
+            consumption.setMeteringPoint(meteringPoint);
 
-        if (meteringPoint == null) {
-            logger.error("Metering point is null for customer '{}'", customerId);
+            Consumption savedConsumption = consumptionService.saveConsumption(consumption);
+
+            logger.info("User '{}' added consumption for customer '{}'", loggedInUsername, customerId);
+            return ResponseEntity.ok(savedConsumption);
+        } else {
+            logger.error("Customer '{}' doesn't have authorisation to add new consumption", customerId);
             return ResponseEntity.status(400).body("Metering point is required.");
         }
-
-        consumption.setMeteringPoint(meteringPoint);
-
-        Consumption savedConsumption = consumptionService.saveConsumption(consumption);
-
-        logger.info("User '{}' added consumption for customer '{}'", loggedInUsername, customerId);
-        return ResponseEntity.ok(savedConsumption);
     }
 
     /**
@@ -106,56 +106,42 @@ public class ConsumptionController {
     @GetMapping("/{customerId}/{meteringPointId}/get-consumptions")
     public ResponseEntity<?> getConsumptions( @PathVariable long customerId, @PathVariable long meteringPointId, @RequestHeader("Authorization") String token) {
         String loggedInUsername = jwtUtil.extractUsername(token.replace("Bearer ", ""));
-        Customer loggedInCustomer = customerService.getCustomerByUsername(loggedInUsername);
+        if (checkAuthorization(token, customerId) == null) {
+            MeteringPoints meteringPoint = meteringPointsService.getMeteringPointsById(meteringPointId);
+            if (meteringPoint == null || !meteringPoint.getCustomer().getCustomerId().equals(customerId)) {
+                logger.error("Unauthorized access: User '{}' tried to fetch consumptions for an unauthorized metering point '{}'", loggedInUsername, meteringPointId);
+                return ResponseEntity.status(403).body("You are not authorized to view consumptions for this metering point.");
+            }
 
-        if (!loggedInCustomer.getCustomerId().equals(customerId)) {
-            logger.error("Unauthorized user '{}' tried to get consumptions for customer '{}'", loggedInUsername, customerId);
-            return ResponseEntity.status(403).body("You are not authorized to view consumptions.");
-        }
+            List<ConsumptionDTO> dailyConsumptions = consumptionService.sumDailyConsumptions(meteringPoint.getConsumptionRecords());
 
-        MeteringPoints meteringPoint = meteringPointsService.getMeteringPointsById(meteringPointId);
-        if (meteringPoint == null || !meteringPoint.getCustomer().getCustomerId().equals(customerId)) {
-            logger.error("Unauthorized access: User '{}' tried to fetch consumptions for an unauthorized metering point '{}'", loggedInUsername, meteringPointId);
+            logger.info("User '{}' fetched consumptions for location '{}'", loggedInUsername, meteringPointId);
+            return ResponseEntity.ok(dailyConsumptions);
+        } else {
+            logger.error("Customer '{}' doesn't have Authorisation to get consumption data.", loggedInUsername);
             return ResponseEntity.status(403).body("You are not authorized to view consumptions for this metering point.");
         }
-
-        List<ConsumptionDTO> dailyConsumptions = sumDailyConsumptions(meteringPoint.getConsumptionRecords());
-
-        logger.info("User '{}' fetched consumptions for location '{}'", loggedInUsername, meteringPointId);
-        return ResponseEntity.ok(dailyConsumptions);
     }
 
-    private List<ConsumptionDTO> sumDailyConsumptions(List<Consumption> consumptions) {
-        Map<LocalDate, Double> summedConsumptions = new HashMap<>();
-        Map<LocalDate, Long> firstConsumptionIds = new HashMap<>();
-        Map<LocalDate, AmountUnit> firstAmountUnits = new HashMap<>();
-
-        for (Consumption consumption : consumptions) {
-            LocalDate consumptionDate = consumption.getConsumptionTime();
-
-            summedConsumptions.merge(consumptionDate, consumption.getAmount(), Double::sum);
-
-            firstConsumptionIds.putIfAbsent(consumptionDate, consumption.getConsumptionId());
-            firstAmountUnits.putIfAbsent(consumptionDate, consumption.getAmountUnit());
+    @GetMapping("/{customerId}/get-consumptions")
+        public ResponseEntity<?> getCustomerConsumptions(@PathVariable long customerId, @RequestHeader("Authorization") String token) {
+            String loggedInUsername = jwtUtil.extractUsername(token.replace("Bearer ", ""));
+            if (checkAuthorization(token, customerId) == null) {
+                return ResponseEntity.ok(consumptionService.getCustomerYearlyConsumption(customerId));
+            } else {
+                logger.error("Customer '{}' doesn't have Authorisation to get consumption data.", loggedInUsername);
+                return ResponseEntity.status(403).body("You are not authorized to view consumptions for this metering point.");
+            }
         }
 
-        List<ConsumptionDTO> consumptionDTOs = new ArrayList<>();
-        for (Map.Entry<LocalDate, Double> entry : summedConsumptions.entrySet()) {
-            LocalDate date = entry.getKey();
-            Double summedAmount = entry.getValue();
+        public ResponseEntity<String> checkAuthorization(String token, long customerId) {
+        String loggedInUsername = jwtUtil.extractUsername(token.replace("Bearer ", ""));
+        Customer loggedInCustomer = customerService.getCustomerByUsername(loggedInUsername);
 
-            Long consumptionId = firstConsumptionIds.get(date);
-            AmountUnit amountUnit = firstAmountUnits.get(date);
-
-            ConsumptionDTO consumptionDTO = new ConsumptionDTO(
-                    consumptionId,
-                    summedAmount,
-                    amountUnit,
-                    date
-            );
-            consumptionDTOs.add(consumptionDTO);
+        if (loggedInCustomer == null || !loggedInCustomer.getCustomerId().equals(customerId)) {
+            logger.error("Unauthorized user '{}' tried to access data for customer '{}'", loggedInUsername, customerId);
+            return ResponseEntity.status(500).body("You are not authorized to access this customer's data.");
         }
-
-        return consumptionDTOs;
+        return null;
     }
 }
