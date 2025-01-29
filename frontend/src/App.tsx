@@ -84,91 +84,81 @@ const App: React.FC = () => {
     };
 
     return (
-        <div className="bg-slate-800 h-auto">
+        <div className="bg-slate-800 h-auto min-h-screen">
         <Disclosure as="nav" className="bg-gray-800">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                     <div className="flex items-center">
-                        <div className="hidden md:block">
+                        <div>
                             <div className="ml-10 flex items-baseline space-x-4">
-                            {navigation.map((item) => (
-                                <button
-                                key={item.name}
-                                onClick={() => handleNavClick(item.name)}
-                                aria-current={item.name === activeNav ? 'page' : undefined}
-                                className={classNames(
-                                    item.name === activeNav
-                                        ? 'bg-emerald-700 text-white'
-                                        : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                    'rounded-md px-3 py-2 text-sm font-medium'
-                                )}
-                                >
-                                    {item.name}
-                                </button>
-                            ))}
+                                {navigation.map((item) => (
+                                    <button
+                                    key={item.name}
+                                    onClick={() => handleNavClick(item.name)}
+                                    aria-current={item.name === activeNav ? 'page' : undefined}
+                                    className={classNames(
+                                        item.name === activeNav
+                                            ? 'bg-emerald-700 text-white'
+                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                                        'rounded-md px-3 py-2 text-sm font-medium'
+                                    )}
+                                    >
+                                        {item.name}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </div>
-                    <div className="hidden md:block">
-                    <div className="ml-4 flex items-center md:ml-6">
-                        <Menu as="div" className="relative ml-3">
-                        <div>
-                            <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
-                                <span className="absolute -inset-1.5" />
-                                <span className="sr-only">Ava kasutaja menüü</span>
-                                <div className="mr-3">
-                                    <div className="text-base/5 font-medium text-white">{user ? user.first_name : 'Guest'}</div>
-                                    <div className="text-sm font-medium text-gray-400">{user ? user.username : 'Guest'}</div>
+                    <div>
+                        <div className="ml-4 flex items-center">
+                            <Menu as="div" className="relative ml-3">
+                                <div>
+                                    <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                                        <span className="absolute -inset-1.5" />
+                                        <div className="mr-3">
+                                            <div className="text-base/5 font-medium text-white">{user ? user.first_name : 'Guest'}</div>
+                                            <div className="text-sm font-medium text-gray-400">{user ? user.username : 'Guest'}</div>
+                                        </div>
+                                        <div className="p-1 rounded-full items-center bg-emerald-800">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill="white"
+                                                className="size-6"
+                                                >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </MenuButton>
                                 </div>
-                                <div className="p-1 rounded-full items-center bg-emerald-800">
-                                    <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="white"
-                                    className="size-6"
+                                <MenuItems
+                                    transition
+                                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
                                     >
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
-                                        clipRule="evenodd"
-                                    />
-                                    </svg>
-                                </div>
-                            </MenuButton>
+                                        {userNavigation.map((item) => (
+                                            <MenuItem key={item.name}>
+                                                <a className='block w-full'>
+                                                    <button
+                                                        onClick={item.onclick}
+                                                        className="w-full flex justify-start px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden  hover:bg-slate-300"
+                                                        >
+                                                        {item.name}
+                                                    </button>
+                                                </a>
+                                            </MenuItem>
+                                        ))}
+                                </MenuItems>
+                            </Menu>
                         </div>
-                        <MenuItems
-                            transition
-                            className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-                        >
-                            {userNavigation.map((item) => (
-                            <MenuItem key={item.name}>
-                                <a className='block w-full'>
-                                    <button
-                                        onClick={item.onclick}
-                                        className="w-full flex justify-start px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden  hover:bg-slate-300"
-                                        >
-                                        {item.name}
-                                    </button>
-                                </a>
-                            </MenuItem>
-                            ))}
-                        </MenuItems>
-                        </Menu>
-                    </div>
-                    </div>
-                    <div className="-mr-2 flex md:hidden">
-                    {/* Mobile menu button */}
-                    <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
-                        <span className="absolute -inset-0.5" />
-                        <span className="sr-only">Ava peamenüü</span>
-                        <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
-                        <XMarkIcon aria-hidden="true" className="hidden size-6 group-data-open:block" />
-                    </DisclosureButton>
                     </div>
                 </div>
             </div>
 
-            <DisclosurePanel className="md:hidden">
+            <DisclosurePanel>
                 <div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
                     {navigation.map((item) => (
                         <DisclosureButton
@@ -193,10 +183,10 @@ const App: React.FC = () => {
                                     viewBox="0 0 24 24"
                                     fill="white"
                                     className="size-6" >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
-                                    clipRule="evenodd" />
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                                        clipRule="evenodd" />
                                 </svg>
                             </div>
                         </div>
