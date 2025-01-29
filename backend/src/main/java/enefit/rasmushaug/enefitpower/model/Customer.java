@@ -2,6 +2,7 @@ package enefit.rasmushaug.enefitpower.model;
 
 import java.util.List;
 
+import enefit.rasmushaug.enefitpower.dto.MeteringPointsDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +38,7 @@ public class Customer {
     private String password;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MeteringPoints> meteringPoints;
+    private List<MeteringPointsDTO> meteringPoints;
 
     /**
      * Returns a string representation of the customer object.
@@ -103,7 +104,7 @@ public class Customer {
         return username;
     }
 
-    public List<MeteringPoints> getMeteringPoints() {
+    public List<MeteringPointsDTO> getMeteringPoints() {
         return meteringPoints;
     }
 
@@ -153,7 +154,7 @@ public class Customer {
         this.username = username;
     }
 
-    public void setMeteringPoints(List<MeteringPoints> meteringPoints) {
+    public void setMeteringPoints(List<MeteringPointsDTO> meteringPoints) {
         this.meteringPoints = meteringPoints;
     }
 }

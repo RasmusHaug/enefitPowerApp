@@ -46,24 +46,14 @@ public class MeteringPoints {
     @OneToMany(mappedBy = "meteringPoint", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Consumption> consumptionRecords;
 
-    /**
-     * Converts the metering point entity to a readable string representation.
-     * Includes the metering point ID, customer ID, name, address, city, postal code,
-     * and the count of associated consumption records.
-     *
-     * @return String representation of the metering point.
-     */
-    @Override
-    public String toString() {
-        return "MeteringPoints{" +
-                "meteringPointId=" + meteringPointId +
-                ", customerId=" + (customer != null ? customer.getCustomerId() : "null") + // Avoid null pointer exception
-                ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
-                ", city='" + city + '\'' +
-                ", postalCode='" + postalCode + '\'' +
-                ", consumptionRecordsCount=" + (consumptionRecords != null ? consumptionRecords.size() : 0) +
-                '}';
+    public MeteringPoints() {}
+
+    public MeteringPoints(String name, String address, String city, String postalCode, Customer customer) {
+        this.name = name;
+        this.address = address;
+        this.city = city;
+        this.postalCode = postalCode;
+        this.customer = customer;
     }
 
     // GETTERS
@@ -192,5 +182,18 @@ public class MeteringPoints {
      */
     public void setConsumptionRecords(List<Consumption> consumptionRecords) {
         this.consumptionRecords = consumptionRecords;
+    }
+
+    @Override
+    public String toString() {
+        return "MeteringPoints{" +
+                "meteringPointId=" + meteringPointId +
+                ", customerId=" + (customer != null ? customer.getCustomerId() : "null") +
+                ", name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", city='" + city + '\'' +
+                ", postalCode='" + postalCode + '\'' +
+                ", consumptionRecordsCount=" + (consumptionRecords != null ? consumptionRecords.size() : 0) +
+                '}';
     }
 }

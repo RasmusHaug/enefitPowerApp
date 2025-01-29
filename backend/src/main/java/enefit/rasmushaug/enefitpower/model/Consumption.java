@@ -1,11 +1,11 @@
 package enefit.rasmushaug.enefitpower.model;
 
-import java.sql.Timestamp;
-
+import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,10 +26,48 @@ public class Consumption {
     private MeteringPoints meteringPoint;
 
     private Double amount;
+
+    @Enumerated(EnumType.STRING)
     private String amountUnit;
 
     @Column(name = "consumption_time")
-    private Timestamp consumptionTime;
+    private LocalDate consumptionTime;
+
+    public Double getAmount() {
+        return amount;
+    }
+    public String getAmountUnit() {
+        return amountUnit;
+    }
+    public long getConsumptionId() {
+        return consumptionId;
+    }
+    public LocalDate getConsumptionTime() {
+        return consumptionTime;
+    }
+    public MeteringPoints getMeteringPoint() {
+        return meteringPoint;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+    public void setAmountUnit(String amountUnit) {
+        this.amountUnit = amountUnit;
+    }
+    public void setConsumptionId(long consumptionId) {
+        this.consumptionId = consumptionId;
+    }
+    public void setConsumptionTime(LocalDate consumptionTime) {
+        this.consumptionTime = consumptionTime;
+    }
+    public void setMeteringPoint(MeteringPoints meteringPoint) {
+        this.meteringPoint= meteringPoint;
+    }
+
+    public enum AmountUnit {
+        kWh, mWh
+    }
 
     @Override
     public String toString() {
@@ -40,47 +78,5 @@ public class Consumption {
             ", amountUnit='" + amountUnit + '\'' +
             ", consumptionTime=" + consumptionTime +
             '}';
-    }
-    
-    // GETTERS
-    public Double getAmount() {
-        return amount;
-    }
-
-    public String getAmountUnit() {
-        return amountUnit;
-    }
-
-    public long getConsumptionId() {
-        return consumptionId;
-    }
-
-    public Timestamp getConsumptionTime() {
-        return consumptionTime;
-    }
-
-    public MeteringPoints getMeteringPoint() {
-        return meteringPoint;
-    }
-
-    // SETTERS
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public void setAmountUnit(String amountUnit) {
-        this.amountUnit = amountUnit;
-    }
-
-    public void setConsumptionId(long consumptionId) {
-        this.consumptionId = consumptionId;
-    }
-
-    public void setConsumptionTime(Timestamp consumptionTime) {
-        this.consumptionTime = consumptionTime;
-    }
-
-    public void setMeteringPoint(MeteringPoints meteringPoint) {
-        this.meteringPoint= meteringPoint;
     }
 }
