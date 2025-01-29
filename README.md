@@ -25,6 +25,9 @@ Lisaks back-end kasutab looge, et teavitada järgmist informatsiooni serveri adm
 + Laadides andmeid Eleringi API-st
 
 **Rakendusega ei ole kaasas ettevalmistatud andmebaasi.**
+Lihtsaim viis testida rakenduse funktsionaalsust on `Tarbimine` sektsioonis lisada mitu asukohta ning neile lisada ainult 1 sisend iga kuu kohta.
+Kuna backend liidab kõik ühe kuu elektri kasutamise kokku pole algorütmiliselt vahet kas lisada 10 väikest elektrikulu või 1 suur.
+
 
 ## Installeerimine
 Rakenduse testimiseks ning lookalseks jooksmiseks tuleb installida järgnevad front-end ja back-end rakendused.
@@ -197,6 +200,14 @@ Sellele lisandub uus nupp `Lisa uus tarbimine` kus kasutaja saab salvestada elek
 Täites 2 lahtrit ja klikates **SALVESTA** ilmub tulpdiagramm koos värskelt lisatud elektrikuluga.
 
 Juhul kui kasutaja lisab elektri tarbimise juba olemasolevale kuupäevale liidetakse see selle päeva kulule lisaks.
+
+### Kulu
+
+Kulu korrutab kokku kuu elektrihinna kasutaja tarbimisega ning näitab graafikul kui poalju kasutaja peab elektri eest tasuma.
+Kulu arvutuskäik on järgnev:
+- Eleringi kuu keskmine summa ((kWh + VAT) * kogu kasutaja kuu tarbimine kõikide asukohtade peale)´
+
+
 
 
 ## Kippuvad Vead

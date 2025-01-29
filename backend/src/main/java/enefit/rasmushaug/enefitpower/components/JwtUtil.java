@@ -12,7 +12,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 public class JwtUtil {
     // TODO: Random Testing Secret Key.
     // TODO: IN PRODUCTION take this from environment variable!!!
-    private static final String secretKey = "";
+    private static final String secretKey = "9e4tvChthvAnBwJrH4duembUtWZzTr";
 
     public String generatedToken(String username) {
         return JWT.create()
