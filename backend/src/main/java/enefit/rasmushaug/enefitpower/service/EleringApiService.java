@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import enefit.rasmushaug.enefitpower.dto.MonthlyEleringData;
+import enefit.rasmushaug.enefitpower.dto.MonthlyEleringDataDTO;
 import enefit.rasmushaug.enefitpower.model.EleringData;
 import enefit.rasmushaug.enefitpower.repository.EleringDataRepository;
 
@@ -32,7 +32,7 @@ public class EleringApiService {
         this.eleringDataRepository = eleringDataRepository;
     }
 
-    public List<MonthlyEleringData> fetchMonthlyEleringData(LocalDate startDate, LocalDate endDate) {
+    public List<MonthlyEleringDataDTO> fetchMonthlyEleringData(LocalDate startDate, LocalDate endDate) {
         populateMissingDailyData(startDate, endDate);
         return calculateMonthlyAverages(startDate, endDate);
     }
@@ -71,7 +71,7 @@ public class EleringApiService {
         }
     }
 
-    private List<MonthlyEleringData> calculateMonthlyAverages(LocalDate startDate, LocalDate endDate) {
+    private List<MonthlyEleringDataDTO> calculateMonthlyAverages(LocalDate startDate, LocalDate endDate) {
         List<EleringData> dailyData = eleringDataRepository.findByDateBetween(startDate, endDate);
         return dailyData.stream()
             .collect(Collectors.groupingBy(
@@ -87,7 +87,7 @@ public class EleringApiService {
                     double eurPerMwh = (centsPerKwH / 100) * 10;
                     double eurPerMwhWithVat = (centsPerKwhWithVat / 100) * 10;
 
-                    return new MonthlyEleringData(
+                    return new MonthlyEleringDataDTO(
                         date.toString(),
                         centsPerKwH,
                         centsPerKwhWithVat,

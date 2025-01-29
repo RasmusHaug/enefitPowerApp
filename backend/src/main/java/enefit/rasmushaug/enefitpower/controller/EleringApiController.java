@@ -2,7 +2,7 @@ package enefit.rasmushaug.enefitpower.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import enefit.rasmushaug.enefitpower.dto.MonthlyEleringData;
+import enefit.rasmushaug.enefitpower.dto.MonthlyEleringDataDTO;
 import enefit.rasmushaug.enefitpower.service.EleringApiService;
 
 import java.time.LocalDate;
@@ -23,7 +23,7 @@ public class EleringApiController {
     }
 
     @GetMapping("/fetch-elering-date-year")
-    public ResponseEntity<List<MonthlyEleringData>> fetchEleringDataYear() {
+    public ResponseEntity<List<MonthlyEleringDataDTO>> fetchEleringDataYear() {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusYears(1);
         return ResponseEntity.ok(eleringApiService.fetchMonthlyEleringData(startDate, endDate));
