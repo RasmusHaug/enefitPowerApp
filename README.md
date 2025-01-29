@@ -7,14 +7,14 @@ Katse lahendada Enefit koduülesannet tarkvara inseneri positsioonile.
 Rakendus back-end kasutab [Java Spring Boot 3.4.1](https://spring.io/) koos [Gradle](https://gradle.org/) ja [PostgreSQL](https://www.postgresql.org/) andmebaasiga.
 Rakundese front-end kasutab [Vite](https://vite.dev/) + [React](https://react.dev/) + [Typescript](https://www.typescriptlang.org/) ja [Tailwind CSS](https://tailwindcss.com/) disaini frameworkina.
 
-Applikatsioon lubab kasutajatel registreerida, sisse logida ja näha oma elektri kasutust. Elektri hinna võtab rakendus Eleringi avalikust APIst. 
+Applikatsioon lubab kasutajatel registreerida, sisse logida ja näha oma elektri kasutust. Elektri hinna võtab rakendus Eleringi avalikust APIst.
 Et säästa Eleringi ning mitte tekitada neile mittetahtlik DOS rünnak salvestab back-end Eleringi andmed oma andmebaasi ning kui võimalik kasutab andmeid sealt üle konstantse Elering API pingimise.
 
-Kasutaja saab endale lisada eluasemeid piiramatult ja igale eluasemele lisada elektri tarbimist. 
+Kasutaja saab endale lisada eluasemeid piiramatult ja igale eluasemele lisada elektri tarbimist.
 Hetkel applikatsioon näitab ainult viimase 7 päeva Eluasemete kulu andmeid.
 Andmebaasis on kõik varasemad andmed salvestatud.
 
-Applikatsioon krüpteerib kasutaja paroolid andmebaasis ja kontrollib, et kasutaja lisab ainult enda eluasemetele uusi tarbimisi. 
+Applikatsioon krüpteerib kasutaja paroolid andmebaasis ja kontrollib, et kasutaja lisab ainult enda eluasemetele uusi tarbimisi.
 Lisaks back-end kasutab looge, et teavitada järgmist informatsiooni serveri administraatorile:
 + Uus kasutaja registreeritud
 + Uus kasutaja ebaõnnestus registreerimisega
@@ -44,7 +44,7 @@ npm install
 Selle tulemusena peaksid kõik lisad alla laadima.
 
 #### Front-end Moodulid
-1. [NodeJS 22.13.1 (LTS)](https://nodejs.org/en/download)  
+1. [NodeJS 22.13.1 (LTS)](https://nodejs.org/en/download)
 	1. **npm** versioni 11.0.0 jaoks.
 2. [TypeScript]() - `npm install typescript --save-dev`
 3. [Tailwind CSS](https://tailwindcss.com/docs/installation/using-vite) - `npm install tailwindcss @tailwindcss/vite`
@@ -82,7 +82,7 @@ Kasutades [Spring Boot Initializr](https://start.spring.io/) loodi Back-end jär
 Kui kõik eelnimetatud vajalik installitud, saab rakendust jooksutada.
 
 ### Andmebaasi seadistamine
-Alustuseks tuleb seadistada andmebaas. 
+Alustuseks tuleb seadistada andmebaas.
 Juhul kui veel ei ole, tuleb installida [PostgreSQL](https://www.postgresql.org/) arvutisse.
 
 PostgreSQL installimis asukoha võib suvaliselt valida kus soovite, aga meelde tuleb jätta järgnevad seadistused:
@@ -164,7 +164,7 @@ Seejärel front-end käivitus edukalt ning rakendus jookseb.
 ## Rakendusest Endast
 Kui rakendus töötab, tuleb navigeerida front-end aadressile (http://localhost:5173/) kus peaks ette tulema sisselogimise aken.
 
-Kuna andmebaas on värsekelt loodud puuduvad sealt kasutajad. 
+Kuna andmebaas on värsekelt loodud puuduvad sealt kasutajad.
 Klikka `Registeeri UUS kasutaja` nupule ja täida väljad endale meeldejäävate andmetega.
 
 Juhul kui Back-end ei tuvasta viga sisestatud andmetes logib sind ka kohe sisse.
@@ -173,8 +173,8 @@ Juhul kui Back-end ei tuvasta viga sisestatud andmetes logib sind ka kohe sisse.
 **Elektri Börs** on loodud, et kasutajale näidata Eleringi andmetest saadud informatsiooni.
 Navigeerides leheküljele saadetakse `Fetch` käsklus backend-i mis kogub kokku viimase aasta elektri keskmise hinna, arvutab kuu keskmise elektri hinna ning lõpetuseks edastab andmed kliendile.
 
-Kasutades [Recharts](https://recharts.org/en-US/) pluginat näitab saadud andmeid tulpdiagrammina. 
-Kokku on 4 tulpdiagrammi, 
+Kasutades [Recharts](https://recharts.org/en-US/) pluginat näitab saadud andmeid tulpdiagrammina.
+Kokku on 4 tulpdiagrammi,
 1. Kuu keskmine Elektri hind sent kWh kohta
 2. Kuu keskmine Elektri hind sent kWh kohta koos käibemaksuga
 3. Kuu keskmine Elektri hind EUR/MWh
@@ -189,8 +189,8 @@ Uut eluase salvestades küsib applikatsioon järgnevat informatsiooni:
 3. `Linn` - asukoha linn
 4. `Postiindeks` - asukoha postiindeks
 
-Täites kõik neli vormi ja klikates **Salvesta** ilmub uus asukoht ekraanile. 
-Sellele lisandub uus nupp `Lisa uus tarbimine` kus kasutaja saab salvestada elektri tarbimisi elukoha kohta. 
+Täites kõik neli vormi ja klikates **Salvesta** ilmub uus asukoht ekraanile.
+Sellele lisandub uus nupp `Lisa uus tarbimine` kus kasutaja saab salvestada elektri tarbimisi elukoha kohta.
 1. `Kogus kWh` - kogus elektrit kasutatud. Mõõduna kasutatakse **kWh** ühikut.
 2. `Kuupäev kulutatud` - mis kuupäeval elektrit kasutatu. Kellaaeg on hetkel eemaldatud lihtsustamise eesmärgil.
 
@@ -201,7 +201,7 @@ Juhul kui kasutaja lisab elektri tarbimise juba olemasolevale kuupäevale liidet
 
 ## Kippuvad Vead
 ### Back-end veateated
-1.  
+1.
 ```shell
 : SQL Error: 0, SQLState: 08004
 : The server requested SCRAM-based authentication, but no password was provided.
@@ -209,10 +209,10 @@ Juhul kui kasutaja lisab elektri tarbimise juba olemasolevale kuupäevale liidet
 
 org.hibernate.exception.JDBCConnectionException: unable to obtain isolated JDBC connection [The server requested SCRAM-based authentication, but no password was provided.]
 ```
-tähendab, et andmebaasi parooli pole seadistatud. 
+tähendab, et andmebaasi parooli pole seadistatud.
 See tuleb seadistada [back end peatüki alguses](#Back-End)
 
-2. 
+2.
 ```shell
 : SQL Error: 0, SQLState: 28P01
 : FATAL: password authentication failed for user "postgres"
