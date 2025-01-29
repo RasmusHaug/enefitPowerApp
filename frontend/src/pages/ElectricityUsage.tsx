@@ -233,7 +233,7 @@ const Locations: React.FC = () => {
 
             {/* Add Metering Point/Location Form */}
             {isAddingLocation && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                     <div className="bg-slate-700 rounded-md p-6 w-96 border-4 border-emerald-700">
                         <h2 className="text-lg font-bold mb-4">Lisa uus eluase</h2>
                         <form onSubmit={addMeteringPoint}>

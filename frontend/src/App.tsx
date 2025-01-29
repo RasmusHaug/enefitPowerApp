@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 
 import { useUser } from './CustomerManagement/UserContext';
 
-import Overview from './pages/MarketPrice';
-import Calendar from './pages/ElectricityUsage';
-import Reports from './pages/Expenses';
+import MarketPrice from './pages/MarketPrice';
+import ElectricityUsage from './pages/ElectricityUsage';
 
 
 function classNames(...classes: string[]) {
@@ -24,7 +22,6 @@ const App: React.FC = () => {
     const navigation = [
         { name: 'Elektri Börs', current: true },
         { name: 'Tarbimine', current: false },
-        { name: 'Kulud', current: false },
     ];
     const userNavigation = [
         { name: 'Logi välja', onclick: () => logoutCustomer() },
@@ -73,13 +70,11 @@ const App: React.FC = () => {
     const renderContent = () => {
         switch (activeNav) {
             case 'Elektri Börs':
-                return <Overview />;
+                return <MarketPrice />;
             case 'Tarbimine':
-                return <Calendar />;
-            case 'Kulud':
-                return <Reports />;
+                return <ElectricityUsage />;
             default:
-                return null;
+                return <MarketPrice />;
         }
     };
 
