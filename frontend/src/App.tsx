@@ -6,6 +6,7 @@ import { useUser } from './CustomerManagement/UserContext';
 
 import MarketPrice from './pages/MarketPrice';
 import ElectricityUsage from './pages/ElectricityUsage';
+import Expense from './pages/Expense';
 
 
 function classNames(...classes: string[]) {
@@ -22,6 +23,7 @@ const App: React.FC = () => {
     const navigation = [
         { name: 'Elektri Börs', current: true },
         { name: 'Tarbimine', current: false },
+        { name: 'Kulu', current: false }
     ];
     const userNavigation = [
         { name: 'Logi välja', onclick: () => logoutCustomer() },
@@ -73,6 +75,8 @@ const App: React.FC = () => {
                 return <MarketPrice />;
             case 'Tarbimine':
                 return <ElectricityUsage />;
+            case 'Kulu':
+                return <Expense />;
             default:
                 return <MarketPrice />;
         }
