@@ -131,7 +131,6 @@ public class ConsumptionService {
                     amountUnit,
                     date
             );
-            logger.info("Final Sum '{}' kWh on '{}'", summedAmount, date);
             consumptionDTOs.add(consumptionDTO);
         }
 
