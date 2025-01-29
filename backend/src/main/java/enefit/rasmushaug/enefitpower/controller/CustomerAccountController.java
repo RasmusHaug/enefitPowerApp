@@ -12,7 +12,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import enefit.rasmushaug.enefitpower.dto.CustomerResponse;
+import enefit.rasmushaug.enefitpower.dto.CustomerDTO;
 import enefit.rasmushaug.enefitpower.model.Customer;
 import enefit.rasmushaug.enefitpower.repository.CustomerRepository;
 import enefit.rasmushaug.enefitpower.service.CustomerService;
@@ -61,7 +61,7 @@ public class CustomerAccountController {
                     logger.error("Customer creation failed for: {}", customer);
                     return ResponseEntity.status(500).body("Registration Failed");
                 }
-                return ResponseEntity.ok(new CustomerResponse(createdCustomer));
+                return ResponseEntity.ok(new CustomerDTO(createdCustomer));
             }
         } catch (IllegalArgumentException e) {
             logger.error("Error registering customer: {}", e.getMessage());
@@ -93,7 +93,7 @@ public class CustomerAccountController {
         if (jwtToken != null) {
             Customer customer = customerRepository.findByUsername(username);
             if (customer != null) {
-                CustomerResponse sessionCustomer = new CustomerResponse(customer, jwtToken);
+                CustomerDTO sessionCustomer = new CustomerDTO(customer, jwtToken);
                 logger.info("User logged in successfully: {}", sessionCustomer);
                 return ResponseEntity.ok(sessionCustomer);
             } else {

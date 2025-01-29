@@ -10,7 +10,7 @@ import enefit.rasmushaug.enefitpower.model.Customer;
  *
  * This class does not include sensitive information such as the password for security reasons.
  */
-public class CustomerResponse {
+public class CustomerDTO {
     private Long customerId;
     private String firstName;
     private String lastName;
@@ -25,7 +25,7 @@ public class CustomerResponse {
      * @param customer The customer entity to extract data from.
      * @param jwtToken The JWT token for the customer session.
      */
-    public CustomerResponse(Customer customer, String jwtToken) {
+    public CustomerDTO(Customer customer, String jwtToken) {
         this.customerId = customer.getCustomerId();
         this.firstName = customer.getFirstName();
         this.lastName = customer.getLastName();
@@ -40,7 +40,7 @@ public class CustomerResponse {
      *
      * @param customer The customer entity to extract data from.
      */
-    public CustomerResponse(Customer customer) {
+    public CustomerDTO(Customer customer) {
         this.customerId = customer.getCustomerId();
         this.firstName = customer.getFirstName();
         this.lastName = customer.getLastName();
