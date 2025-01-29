@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import enefit.rasmushaug.enefitpower.model.Customer;
 import enefit.rasmushaug.enefitpower.repository.CustomerRepository;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,16 +26,6 @@ class CustomerAccountControllerTest {
     private CustomerRepository customerRepository;
 
     private ObjectMapper objectMapper;
-
-    /**
-     * Initializes test dependencies and cleans up the database before each test.
-     * This ensures no leftover data affects the tests.
-     */
-    @BeforeEach
-    public void setUp() {
-        objectMapper = new ObjectMapper();
-        customerRepository.deleteAll(); // Clear all existing customer data
-    }
 
     /**
      * Test case for successful customer registration.
