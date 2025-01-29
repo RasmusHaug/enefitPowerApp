@@ -27,7 +27,6 @@ const Overview: React.FC = () => {
             }
 
             const result = await response.json();
-            console.log(result);
 
             const transformedData = result.map((entry: any) => ({
                 date: entry.date,
@@ -51,12 +50,9 @@ const Overview: React.FC = () => {
     }, []);
 
     if (loading) {
-        return <div className="text-white">Loading...</div>;
+        return <div className="bg-slate-900 text-white">Loading...</div>;
     }
 
-    if (error) {
-        return <div className="text-red-500">Error: {error}</div>;
-    }
 
     return (
         <div>
