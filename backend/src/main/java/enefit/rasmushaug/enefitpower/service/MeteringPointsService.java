@@ -18,7 +18,11 @@ public class MeteringPointsService {
         return meteringPointsRepository.save(meteringPoint);
     }
 
+    public MeteringPoints getMeteringPointsById(Long meteringPointId) {
+        return meteringPointsRepository.findByMeteringPointId(meteringPointId);
+    }
+
     public List<MeteringPoints> getMeteringPointsByCustomerId(Long customerId) {
-        return meteringPointsRepository.findByCustomerCustomerId(customerId);
+        return meteringPointsRepository.findByCustomerId(customerId);
     }
 }
