@@ -35,7 +35,7 @@ const App: React.FC = () => {
 
     const logoutCustomer = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/customers/logout', {
+            const response = await fetch(`http://localhost:8080/api/customers/logout/${user?.username}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
