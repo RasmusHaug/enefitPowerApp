@@ -115,6 +115,7 @@ public class CustomerAccountController {
      */
     @PostMapping("/logout")
     public ResponseEntity<String> logoutCustomer() {
+        // TODO: Add credentials to parameter in order to display what user logs out using logger.
         return ResponseEntity.ok("Logged out successfully.");
     }
 }

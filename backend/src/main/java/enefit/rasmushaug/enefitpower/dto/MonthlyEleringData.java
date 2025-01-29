@@ -1,26 +1,26 @@
 package enefit.rasmushaug.enefitpower.dto;
 
 public class MonthlyEleringData {
-    private String yearMonth;
-    private double averageCentsPerKwh;
+    private String date;
+    private double centsPerKwh;
     private double centsPerKwhWithVat;
     private double eurPerMwh;
     private double eurPerMwhWithVat;
 
-    public MonthlyEleringData(String yearMonth, double averageCentsPerKwh, double centsPerKwhWithVat, double eurPerMwh, double eurPerMwhWithVat) {
-        this.yearMonth = yearMonth;
-        this.averageCentsPerKwh = averageCentsPerKwh;
+    public MonthlyEleringData(String date, double centsPerKwh, double centsPerKwhWithVat, double eurPerMwh, double eurPerMwhWithVat) {
+        this.date = date;
+        this.centsPerKwh = centsPerKwh;
         this.centsPerKwhWithVat = centsPerKwhWithVat;
         this.eurPerMwh = eurPerMwh;
         this.eurPerMwhWithVat = eurPerMwhWithVat;
     }
 
-    public String getYearMonth() {
-        return yearMonth;
+    public String getdate() {
+        return date;
     }
 
-    public double getAverageCentsPerKwh() {
-        return averageCentsPerKwh;
+    public double getcentsPerKwh() {
+        return centsPerKwh;
     }
 
     public double getCentsPerKwhWithVat() {

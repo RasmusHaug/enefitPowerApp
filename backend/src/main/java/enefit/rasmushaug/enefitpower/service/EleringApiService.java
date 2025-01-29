@@ -1,6 +1,5 @@
 package enefit.rasmushaug.enefitpower.service;
 
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -81,7 +80,7 @@ public class EleringApiService {
             ))
             .entrySet().stream()
             .map(entry -> {
-                    YearMonth yearMonth = entry.getKey();
+                    YearMonth date = entry.getKey();
                     double centsPerKwH = entry.getValue();
 
                     double centsPerKwhWithVat = centsPerKwH * (1 + VAT_RATE);
@@ -89,7 +88,7 @@ public class EleringApiService {
                     double eurPerMwhWithVat = (centsPerKwhWithVat / 100) * 10;
 
                     return new MonthlyEleringData(
-                        yearMonth.toString(),
+                        date.toString(),
                         centsPerKwH,
                         centsPerKwhWithVat,
                         eurPerMwh,
