@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { useUser } from './CustomerManagement/UserContext';
 
-import Overview from './pages/Overview';
-import Calendar from './pages/Locations';
-import Reports from './pages/Reports';
+import Overview from './pages/MarketPrice';
+import Calendar from './pages/ElectricityUsage';
+import Reports from './pages/Expenses';
 
 
 function classNames(...classes: string[]) {
@@ -84,7 +84,7 @@ const App: React.FC = () => {
     };
 
     return (
-        <div className="bg-slate-800 h-[100vh]">
+        <div className="bg-slate-800 h-auto">
         <Disclosure as="nav" className="bg-gray-800">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
