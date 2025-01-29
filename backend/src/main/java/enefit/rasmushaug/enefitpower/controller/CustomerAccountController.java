@@ -2,6 +2,7 @@ package enefit.rasmushaug.enefitpower.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import enefit.rasmushaug.enefitpower.dto.CustomerDTO;
 import enefit.rasmushaug.enefitpower.model.Customer;
 import enefit.rasmushaug.enefitpower.repository.CustomerRepository;
 import enefit.rasmushaug.enefitpower.service.CustomerService;
+import jakarta.websocket.server.PathParam;
 
 /**
  * Controller for handling customer account operations.
@@ -113,9 +115,9 @@ public class CustomerAccountController {
      * @return ResponseEntity<String> A responseEntity with a logout success message.
      *         Returns HTTP 200 OK on successful logout.
      */
-    @PostMapping("/logout")
-    public ResponseEntity<String> logoutCustomer() {
-        // TODO: Add credentials to parameter in order to display what user logs out using logger.
+    @PostMapping("/logout/{username}")
+    public ResponseEntity<String> logoutCustomer(@PathVariable String username) {
+        logger.info("Customer '{}' has sucessfully logged out.", username);
         return ResponseEntity.ok("Logged out successfully.");
     }
 }
