@@ -28,7 +28,6 @@ const Overview: React.FC = () => {
 
             const result = await response.json();
             console.log(result);
-            
 
             const transformedData = result.map((entry: any) => ({
                 date: entry.date,
@@ -38,7 +37,9 @@ const Overview: React.FC = () => {
                 eurPerMwhWithVat: parseFloat(entry.eurPerMwhWithVat.toFixed(2)),
             }));
 
-            setData(transformedData);
+            const sortedData = transformedData.sort((a: { date: string | number | Date; }, b: { date: string | number | Date; }) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+            setData(sortedData);
         } catch (error: any) {
             setError(error.message || 'An unexpected error occurred.');
         } finally {
